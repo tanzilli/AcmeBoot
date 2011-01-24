@@ -47,12 +47,15 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.16"
+#define ACME_BOOTSTRAP_VERSION "1.17"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
  *
+ * 1.17 Led red blinks again (like the < 1.16 version ) when 
+ *      the microSD is not found
+ * 
  * 1.16 Tested with Data and Serial Flash (256KB and 8MB)
  *      First experiment with 128MB od DRAM
  *
@@ -956,15 +959,19 @@ int main()
 	// first 64 of header
 	//-------------------------------------------------------------------------
 
-	Acme_SDcard_CopyFile(KERNEL_UIMAGE,0x20008000-0x40,0);
+	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,0x20008000-0x40,0)!=0) {
+		printf("%s not found...\n\r",KERNEL_UIMAGE);
+		led_error(UIMAGE_NOT_FOUND);
+		// This point is never reached
+	}
 
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
 	printf("Jump to Kernel\n\r");
 
-	//GoToJumpAddress(0x20008000, MACH_TYPE);
-	GoToJumpAddress(0x20008000, 3129);
+	GoToJumpAddress(0x20008000, MACH_TYPE);
+	//GoToJumpAddress(0x20008000, 3129);
 
 	led_error(FLASH_WRITE_ERROR);
 	return 0;

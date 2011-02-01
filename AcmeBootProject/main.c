@@ -422,7 +422,6 @@ static unsigned char AT26_ReadStatus(At26 *pAt26)
 
 	// Issue a status read command
 	error = AT26_SendCommand(pAt26, AT26_READ_STATUS, 1, &status, 1, 0, 0, 0);
-	//ASSERT(!error, "-F- AT26_GetStatus: Failed to issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for transfer to finish
@@ -444,7 +443,6 @@ static void AT26_WriteStatus(At26 *pAt26, unsigned char status)
 
 	// Issue a write status command
 	error = AT26_SendCommand(pAt26, AT26_WRITE_STATUS, 1, &status, 1, 0, 0, 0);
-	//ASSERT(!error, "-F- AT26_WriteStatus: Failed to issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));
@@ -480,7 +478,6 @@ static unsigned int AT26_ReadJedecId(At26 *pAt26)
 	// Issue a read ID command
 	error = AT26_SendCommand(pAt26, AT26_READ_JEDEC_ID, 1,
 		             (unsigned char *) &id, 3, 0, 0, 0);
-	//ASSERT(!error, "-F- AT26_GetJedecId: Could not issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for transfer to finish
@@ -502,7 +499,6 @@ static void AT26_EnableWrite(At26 *pAt26)
 
 	// Issue a write enable command
 	error = AT26_SendCommand(pAt26, AT26_WRITE_ENABLE, 1, 0, 0, 0, 0, 0);
-	//ASSERT(!error, "-F- AT26_EnableWrite: Could not issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for end of transfer
@@ -562,7 +558,7 @@ static unsigned char AT26_EraseChip(At26 *pAt26)
 	// Check that the flash is ready an unprotected
 	status = AT26_ReadStatus(pAt26);
 	if ((status & AT26_STATUS_SWP) != AT26_STATUS_SWP_PROTNONE) {
-		TRACE_WARNING("AT26_EraseBlock: Device is protected.\n\r");
+		TRACE_WARNING("Device protected\n\r");
 		return AT26_ERROR_PROTECTED;
 	}
 
@@ -571,7 +567,6 @@ static unsigned char AT26_EraseChip(At26 *pAt26)
 
 	// Erase the chip
 	error = AT26_SendCommand(pAt26, AT26_CHIP_ERASE_2, 1, 0, 0, 0, 0, 0);
-	//ASSERT(!error, "-F- AT26_ChipErase: Could not issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));    
@@ -597,10 +592,10 @@ static unsigned char AT26_EraseBlock(At26 *pAt26, unsigned int address)
 	// Check that the flash is ready an unprotected
 	status = AT26_ReadStatus(pAt26);
 	if ((status & AT26_STATUS_RDYBSY) != AT26_STATUS_RDYBSY_BUSY) {
-		TRACE_WARNING("AT26_EraseBlock: Device is not ready.\n\r");
+		TRACE_WARNING("Device not ready\n\r");
 		return AT26_ERROR_BUSY;
 	} else if ((status & AT26_STATUS_SWP) != AT26_STATUS_SWP_PROTNONE) {
-		TRACE_WARNING("AT26_EraseBlock: Device is protected.\n\r");
+		TRACE_WARNING("Device protected\n\r");
 		return AT26_ERROR_PROTECTED;
 	}
 
@@ -609,7 +604,6 @@ static unsigned char AT26_EraseBlock(At26 *pAt26, unsigned int address)
 
 	// Start the block erase command
 	error = AT26_SendCommand(pAt26, AT26_BLOCK_ERASE_4K, 4, 0, 0, address, 0, 0);
-	//ASSERT(!error, "-F- AT26_EraseBlock: Could not issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));
@@ -657,7 +651,6 @@ static unsigned char AT26_Write(
 		// Program page
 		error = AT26_SendCommand(pAt26, AT26_BYTE_PAGE_PROGRAM, 4,
 					pData, writeSize, address, 0, 0);
-		//ASSERT(!error, "-F- AT26_WritePage: Failed to issue command.\n\r");
 		ASSERT(!error, "%d\n\r",__LINE__);
 		while (AT26_IsBusy(pAt26));
 		AT26_WaitReady(pAt26);
@@ -691,7 +684,6 @@ static void AT26_Read(
 
 	// Start a read operation
 	error = AT26_SendCommand(pAt26, AT26_READ_ARRAY_LF, 4, pData, size, address, 0, 0);
-	//ASSERT(!error, "-F- AT26_Read: Could not issue command.\n\r");
 	ASSERT(!error, "%d\n\r",__LINE__);
 	while (AT26_IsBusy(pAt26));
 }
@@ -712,7 +704,6 @@ int main()
 	#ifdef SERIAL_FLASH
 	unsigned int jedecId;
 	unsigned int j;
-//	unsigned int address;
 	unsigned int flash_address;
 	#endif
 
@@ -744,9 +735,7 @@ int main()
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
 	printf("\n\r");
-	printf("-- Acme boot ver %s --\n\r", ACME_BOOTSTRAP_VERSION);
-	//printf("-- (Based on Atmel AT91Bootstrap version %s)\n\r", BOOTSTRAP_VERSION);
-	//printf("-- Compiled: %s %s --\n\r", __DATE__, __TIME__);
+	printf("AcmeBoot v%s\n\r", ACME_BOOTSTRAP_VERSION);
 
 	#ifdef DATA_FLASH
 	//printf("Dataflash version\n\r");
@@ -795,7 +784,7 @@ int main()
 	while (!pDesc) {
 		pDesc = AT45_FindDevice(&at45, AT45_GetStatus(&at45));
 	}
-	printf("%s detected\n\r", at45.pDesc->name);
+	printf("%s found\n\r", at45.pDesc->name);
 
 	// Output JEDEC identifier of device
 	//printf("Device identifier: 0x%08X\n\r", AT45_GetJedecId(&at45));
@@ -819,9 +808,9 @@ int main()
 	// Read the JEDEC ID of the device to identify it
 	jedecId = AT26_ReadJedecId(&at26);
 	if (AT26_FindDevice(&at26, jedecId)) {
-		printf("%s detected\n\r", AT26_Name(&at26));
+		printf("%s found\n\r", AT26_Name(&at26));
 	} else {
-		printf("Dev unknown ID:0x%08X\n\r", jedecId);
+		printf("Dev unknown:0x%08X\n\r", jedecId);
 		for (;;);
 	}
 	//ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "-F- MAXPAGESIZE too small\n\r");
@@ -860,7 +849,7 @@ int main()
 		AT26_EraseChip(&at26);
 		#endif
 
-		printf("Writing\n\r");
+		//printf("Writing\n\r");
 
 		// Here the AcmeBoot copy itself from the SRAM0 to the flash memory
 

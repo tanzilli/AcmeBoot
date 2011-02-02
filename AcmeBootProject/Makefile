@@ -28,6 +28,21 @@
 
 #     Makefile for compiling at91bootstrap-project
 
+
+dataflash:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
+		FLASH_MEMORY=data_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		clean all
+
+serialflash:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
+		FLASH_MEMORY=serial_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		clean all
+
 #-------------------------------------------------------------------------------
 #        User-modifiable options
 #-------------------------------------------------------------------------------
@@ -39,6 +54,7 @@ else
     ifeq ($(OP_BOOTSTRAP_MCI), on)
     OPTIMIZATION = -march=armv5t -Os
     else
+
     OPTIMIZATION = -O2
     endif
 endif
@@ -130,7 +146,9 @@ endif
 
 # Compile with chip specific features
 #-------------------------------------------------------------------------------
+ifdef $(RUN)  #avoid error if called with dataflash or serialflash
 include $(AT91LIB)/boards/$(BOARD)/$(CHIP)/chip.mak
+endif 
 
 # Special init for CAP9
 #-------------------------------------------------------------------------------
@@ -378,25 +396,30 @@ clean:
 	-rm -f $(OBJ)/*.o $(BIN)/*.elf $(BIN)/*.map
 
 help:
-	@echo  "Below the description of the command line parameters :"
-	@echo  "   - CHIP        Chip name (Ex: at91cap9)"
-	@echo  "   - BOARD       board name (Ex: at91cap9-dk)"
-	@echo  "   - ORIGIN      Source memory where the module to copy will read"
-	@echo  "                 (dataflash / serialflash / sdcard / nandflash / norflash)"
-	@echo  "   - DESTINATION Destination memory where the module will be copied"
-	@echo  "                 (sdram / ddram)"
-	@echo  "   - BIN_SIZE    Binary size to copy"
-	@echo  "   - FROM_ADDR   Address in source memory where the module will be read"
-	@echo  "                 (not used for SDCard boot)"
-	@echo  "   - FILE_NAME   file name to copy (only for SDcard boot)"
-	@echo  "   - DEST_ADDR   Address in destination memory where the module will be copied"
-	@echo  "                 and where the bootstrap program will do a jump"
-	@echo  "   - STR_DESCR   Description of the module to copy"
-	@echo  "   - BOOTNAME    File name of the output binary. By default the output name is"
-	@echo  "                 boot-$(BOARD)-$(ORIGIN)2$(DESTINATION).bin"
-	@echo  "   - TRACE_LEVEL Determine the trace level. If not present, none trace."
-	@echo ""
-	@echo " Note 1: The use of FROM_ADDR and FILE_NAME is exclusive."
-	@echo ""
-	@echo " Note 2: the last 3 parameters are optional. All the other are mandatory."
+	@echo  "make dataflash"
+	@echo  "   Compile AcmeBoot for NetusG20 with dataflash"
+	@echo  "make serialflash"
+	@echo  "   Compile AcmeBoot for NetusG20 with serialflash"
+
+#	@echo  "Below are the original command line parameters by Atmel:"
+#	@echo  "   - CHIP        Chip name (Ex: at91cap9)"
+#	@echo  "   - BOARD       board name (Ex: at91cap9-dk)"
+#	@echo  "   - ORIGIN      Source memory where the module to copy will read"
+#	@echo  "                 (dataflash / serialflash / sdcard / nandflash / norflash)"
+#	@echo  "   - DESTINATION Destination memory where the module will be copied"
+#	@echo  "                 (sdram / ddram)"
+#	@echo  "   - BIN_SIZE    Binary size to copy"
+#	@echo  "   - FROM_ADDR   Address in source memory where the module will be read"
+#	@echo  "                 (not used for SDCard boot)"
+#	@echo  "   - FILE_NAME   file name to copy (only for SDcard boot)"
+#	@echo  "   - DEST_ADDR   Address in destination memory where the module will be copied"
+#	@echo  "                 and where the bootstrap program will do a jump"
+#	@echo  "   - STR_DESCR   Description of the module to copy"
+#	@echo  "   - BOOTNAME    File name of the output binary. By default the output name is"
+#	@echo  "                 boot-$(BOARD)-$(ORIGIN)2$(DESTINATION).bin"
+#	@echo  "   - TRACE_LEVEL Determine the trace level. If not present, none trace."
+#	@echo ""
+#	@echo " Note 1: The use of FROM_ADDR and FILE_NAME is exclusive."
+#	@echo ""
+#	@echo " Note 2: the last 3 parameters are optional. All the other are mandatory."
 

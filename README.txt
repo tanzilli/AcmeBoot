@@ -26,7 +26,13 @@ Follow the installation messages using the default values.
 To launch the AcmeBoot compilation type:
 
 cd AcmeBoot/AcmeBootProject
-./doit.sh
+
+make dataflash
+	Compile AcmeBoot for NetusG20 with dataflash"
+
+make serialflash
+	Compile AcmeBoot for NetusG20 with serialflash
+   
 
 It creates the ./bin/boot-NetusG20-sdcard2sdram.bin to use with
 Pizzica In-System programming utility as illustrate on:

@@ -47,7 +47,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.17"
+#define ACME_BOOTSTRAP_VERSION "1.17.42"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -97,21 +97,18 @@
 #include "main.h"
 #include <boot.h>
 
-//------------------------------------------------------------------------------
-// Magic Number
-//------------------------------------------------------------------------------
+static struct {
+	// The Magic number is used used by the Pizzica ISP utility to change on-the-fly the
+	// factory default MAC address and by the AcmeBoot to understand when loaded from ISP 
+	// or from serial/data flash
+	unsigned int MyMagicNumber;
 
-// The Magic number is used used by the Pizzica ISP utility to change on-the-fly the
-// factory default MAC address and by the AcmeBoot to understand when loaded from ISP 
-// or from serial/data flash
-
-static unsigned int MyMagicNumber=0x5C5C5C5C;
-
-//------------------------------------------------------------------------------
-// MAC address
-//------------------------------------------------------------------------------
-
-static unsigned char MacAddress[6] = {0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC};
+	// MAC address
+	unsigned char MacAddress[6];
+} mm = {
+	0x5C5C5C5C,
+	{0x12, 0x34, 0x56, 0x78, 0x9A, 0xBC}
+};
 
 // The PINs' on PHY reset
 static const Pin emacRstPins[] = {BOARD_EMAC_RST_PINS};
@@ -734,8 +731,7 @@ int main()
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-	printf("\n\r");
-	printf("AcmeBoot v%s\n\r", ACME_BOOTSTRAP_VERSION);
+	printf("\n\rAcmeBoot v%s\n\r", ACME_BOOTSTRAP_VERSION);
 
 	#ifdef DATA_FLASH
 	//printf("Dataflash version\n\r");
@@ -810,7 +806,7 @@ int main()
 	if (AT26_FindDevice(&at26, jedecId)) {
 		printf("%s found\n\r", AT26_Name(&at26));
 	} else {
-		printf("Dev unknown:0x%08X\n\r", jedecId);
+		printf("Dev unknown\n\r");
 		for (;;);
 	}
 	//ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "-F- MAXPAGESIZE too small\n\r");
@@ -823,18 +819,17 @@ int main()
 
 	//Unprotected the flash
 	AT26_Unprotect(&at26);
-	printf("Unprotected\n\r");
 	#endif
 
 	printf("Pg #: %d\n\r",numPages);
-	printf("Pg size  : %d\n\r",pageSize);
+	printf("Pg s: %d\n\r",pageSize);
 
 	// Check the magic number to know if has been downloaded from flash
 	// or from Pizzica
 
-	if (MyMagicNumber!=0x12345678) {
+	if (mm.MyMagicNumber!=0x12345678) {
 		// Set the magic number
-		MyMagicNumber=0x12345678;
+		mm.MyMagicNumber=0x12345678;
 
 		// Erase the first 16K of dataflash
 		printf("Erasing\n\r");
@@ -848,8 +843,6 @@ int main()
 		#ifdef SERIAL_FLASH
 		AT26_EraseChip(&at26);
 		#endif
-
-		//printf("Writing\n\r");
 
 		// Here the AcmeBoot copy itself from the SRAM0 to the flash memory
 
@@ -865,7 +858,7 @@ int main()
 				original = *(sram_address + page * AT45_PageSize(&at45) + i);
 				copy     = *(pBuffer+i);
 				if (original != copy) {
-					printf ("Expected 0x%02X read 0x%02X\n\r",original,copy);
+					printf ("WR:%02X RD:%02X\n\r",original,copy);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -890,8 +883,9 @@ int main()
 
 			for (j=0;j<pageSize;j++) {
 				if (pBuffer[j] != *(sram_address+flash_address+j)) {
-					printf("Expected 0x%02X, read 0x%02X\n\r",*(sram_address+flash_address+j), pBuffer[j]);
+					printf("WR:%02X RD:%02X\n\r",*(sram_address+flash_address+j), pBuffer[j]);
 					led_error(FLASH_WRITE_ERROR);
+					// This point is never reached
 				}
 			}
 			flash_address += pageSize;
@@ -904,11 +898,9 @@ int main()
 	// EMAC_SA1L and EMAC_SA1H
 	//-------------------------------------------------------------------------
 
-	// Display MAC settings
-	printf("MAC=[0x%x] %02x:%02x:%02x:%02x:%02x:%02x\n\r",
-		(unsigned int)MacAddress,	
-		MacAddress[0], MacAddress[1], MacAddress[2],
-		MacAddress[3], MacAddress[4], MacAddress[5]);
+	printf("MAC: %02x%02x%02x%02x%02x%02x\n\r",
+		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
+		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
 
 	// Power ON
 	AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_EMAC;
@@ -920,13 +912,13 @@ int main()
 	AT91C_BASE_EMACB->EMAC_IDR = ~0;
 
 	// Set the MAC address
-	AT91C_BASE_EMACB->EMAC_SA1L = ( ((unsigned int)MacAddress[3] << 24)
-		                 | ((unsigned int)MacAddress[2] << 16)
-		                 | ((unsigned int)MacAddress[1] << 8 )
-		                 |                MacAddress[0] );
+	AT91C_BASE_EMACB->EMAC_SA1L = ( ((unsigned int)mm.MacAddress[3] << 24)
+		                 | ((unsigned int)mm.MacAddress[2] << 16)
+		                 | ((unsigned int)mm.MacAddress[1] << 8 )
+		                 |                mm.MacAddress[0] );
 
-	AT91C_BASE_EMACB->EMAC_SA1H = ( ((unsigned int)MacAddress[5] << 8 )
-		                 |                MacAddress[4] );
+	AT91C_BASE_EMACB->EMAC_SA1H = ( ((unsigned int)mm.MacAddress[5] << 8 )
+		                 |                mm.MacAddress[4] );
 
 	AT91C_BASE_EMACB->EMAC_NCR = AT91C_EMAC_CLRSTAT;
 
@@ -959,8 +951,8 @@ int main()
 
 	printf("Jump to Kernel\n\r");
 
-	GoToJumpAddress(0x20008000, MACH_TYPE);
-	//GoToJumpAddress(0x20008000, 3129);
+	//GoToJumpAddress(0x20008000, MACH_TYPE);
+	GoToJumpAddress(0x20008000, 3129);
 
 	led_error(FLASH_WRITE_ERROR);
 	return 0;

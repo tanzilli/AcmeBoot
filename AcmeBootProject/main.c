@@ -47,11 +47,14 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.17.45"
+#define ACME_BOOTSTRAP_VERSION "1.18.rc5"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
+ *
+ * 1.18 Read the Kernel CMDLINE configuration from the file cmdline.txt
+ *      on the first microSD partition
  *
  * 1.17 Led red blinks again (like the < 1.16 version ) when 
  *      the microSD is not found
@@ -125,8 +128,9 @@ static const Pin foxg20_pc10 = {1 << 10, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INP
 /// Error coding on red led
 //------------------------------------------------------------------------------
 
-#define UIMAGE_NOT_FOUND  2 	// uimage on microSD not found
-#define FLASH_WRITE_ERROR 3	// flash writing error
+#define UIMAGE_NOT_FOUND   2 	// uimage on microSD not found
+#define FLASH_WRITE_ERROR  3	// flash writing error
+#define MICROSD_NOT_FOUND  4 	// microSD not found
 	
 static void blink_delay(void)
 {
@@ -170,8 +174,9 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 
 #define be32_to_cpu(a) ((a)[0] << 24 | (a)[1] << 16 | (a)[2] << 8 | (a)[3])
 #define SDRAM_START 0x20000000
-#define KERNEL_UIMAGE "uimage"
-#define KERNEL_CMDLINE "cmdline.txt"
+#define KERNEL_UIMAGE	"uImage"
+#define KERNEL_CMDLINE	"cmdline.txt"
+#define MACH_TYPE_FILE 	"machtype.txt"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -701,6 +706,8 @@ int main()
 
 	unsigned int kernel_params;
 	char *tmp;
+	char mach_type_buffer[5];
+	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
 	unsigned int jedecId;
@@ -894,7 +901,7 @@ int main()
 	// EMAC_SA1L and EMAC_SA1H
 	//-------------------------------------------------------------------------
 
-	printf("MAC: %02x%02x%02x%02x%02x%02x\n\r",
+	printf("MAC: %02X%02X%02X%02X%02X%02X\n\r",
 		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
 		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
 
@@ -930,6 +937,11 @@ int main()
 
 	// Enable User Reset
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
+
+	if (Acme_SDcard_Init()!=0) {
+	        printf("No microSD\n\r");
+		led_error(MICROSD_NOT_FOUND);
+	}
 
 	//--------------------------------------------------------------------
 	// Add support for command line parameters in KERNEL_CMDLINE file
@@ -967,6 +979,22 @@ int main()
 	}
 
 	//-------------------------------------------------------------------------
+	// Read the MACH_TYPE from machtype.txt
+	//
+	// 3129 = acmenetusfoxg20. Used starting from Kernel 2.6.38
+	// 1624 = at91sam9g20ek. Previous machtype
+	//
+	// See ARM machine registry on:
+	// http://www.arm.linux.org.uk/developer/machines/
+	//-------------------------------------------------------------------------
+
+	//mach_type_number = 1624;
+	//if (Acme_SDcard_CopyFile(MACH_TYPE_FILE,(unsigned char *)mach_type_buffer,(unsigned long)4)==0) {
+	//	mach_type_buffer[4]=0;
+	//	mach_type_number=(unsigned int)atoi(mach_type_buffer);
+	//}
+
+	//-------------------------------------------------------------------------
 	// Copy from the microSD to the SDRAM the Kernel image cutting the 
 	// first 64 of header
 	//-------------------------------------------------------------------------
@@ -982,7 +1010,8 @@ int main()
 
 	printf("Jump to Kernel\n\r");
 
-	//GoToJumpAddress(0x20008000, MACH_TYPE);
+	printf("%d\n\r",mach_type_number);
+	//GoToJumpAddress(0x20008000, mach_type_number, kernel_params);
 	GoToJumpAddress(0x20008000, 3129, kernel_params);
 
 	led_error(FLASH_WRITE_ERROR);

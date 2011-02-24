@@ -151,50 +151,52 @@ int BOOT_SDcard_CopyFile(const Tdesc *pTd, unsigned char nbTd)
 }
 
 
+int Acme_SDcard_Init(void)
+{
+   // Init Disk
+    if (MEDSdcard_Initialize(&medias[ID_DRV], BOARD_SD_BOOT_MCISLOT)!=1) {
+        return 1;
+    }
+    SD_DisplaySdStatus(&medias[ID_DRV]);
+
+    memset(&fs, 0, sizeof(FATFS));  // Clear file system object    
+    res = f_mount(0, &fs);
+    if( res != FR_OK ) {
+        TRACE_ERROR("f_mount pb: 0x%X\n\r", res);
+        return 1;
+    }
+    return 0;   	
+}
+
 int Acme_SDcard_CopyFile(char *filename,unsigned long destination,unsigned long size)
 {
     unsigned int ByteToRead;
     unsigned int ByteRead;
-  
-    // Init Disk
-    if (MEDSdcard_Initialize(&medias[ID_DRV], BOARD_SD_BOOT_MCISLOT)!=1) {
-        printf("microSD not found\n\r");
-        return 1;
-    }
-    SD_DisplaySdStatus(&medias[ID_DRV]);
-    
-    memset(&fs, 0, sizeof(FATFS));  // Clear file system object    
-    res = f_mount(0, &fs);
-    if( res != FR_OK ) {
-        printf("f_mount pb: 0x%X\n\r", res);
-        return 1;
-    }
-
-    printf("Load %s from microSD\n\r",filename);
+      
+    //printf("Load %s from microSD\n\r",filename);
     res = f_open(&fileObject, filename, FA_OPEN_EXISTING|FA_READ);
     if( res != FR_OK ) {
-        printf("File not found\n\r");
+        TRACE_ERROR("File not found\n\r");
         return 1;
     }
 
-    if (size>0) {
+    if (size>0) 
         ByteToRead = size;
-    } else {
+    else
         ByteToRead = fileObject.fsize;
-    }
     
-    printf("File lenght: %d\n\r", (int)fileObject.fsize); 
-    printf("Byte to read: %d\n\r", (int)ByteToRead); 
+    //printf("File lenght: %d\n\r", (int)fileObject.fsize); 
+    //printf("Byte to read: %d\n\r", (int)ByteToRead); 
     
     res = f_read(&fileObject, (void*)(destination), ByteToRead, &ByteRead);
     if(res != FR_OK) {
-        printf("f_read pb: 0x%X\n\r", res);
+        TRACE_ERROR("f_read pb: 0x%X\n\r", res);
         return 1;
     }    
 
     res = f_close(&fileObject);
     if( res != FR_OK ) {
-        printf("f_close pb: 0x%X\n\r", res);
+        TRACE_ERROR("f_close pb: 0x%X\n\r", res);
         return 1;
     }
     return 0;

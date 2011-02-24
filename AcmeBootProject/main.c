@@ -171,6 +171,7 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType)
 #define be32_to_cpu(a) ((a)[0] << 24 | (a)[1] << 16 | (a)[2] << 8 | (a)[3])
 #define SDRAM_START 0x20000000
 #define KERNEL_UIMAGE "uimage"
+#define KERNEL_CMDLINE "cmdline.txt"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -698,6 +699,9 @@ int main()
 	unsigned int pageSize;
 	unsigned int page;
 
+	unsigned int kernel_params;
+	unsigned char *tmp;
+
 	#ifdef SERIAL_FLASH
 	unsigned int jedecId;
 	unsigned int j;
@@ -926,6 +930,41 @@ int main()
 
 	// Enable User Reset
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
+
+	//--------------------------------------------------------------------
+	// Add support for command line parameters in KERNEL_CMDLINE file
+	// Ideas borrowed from
+	// http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html
+	//-------------------------------------------------------------------------
+
+#define CMDLINE_OFFSET (0x100+(2+4+2)*4) //0x100 plus 8 32bit words
+#define ATAG_NONE     0x00000000
+#define ATAG_CORE     0x54410001
+#define ATAG_MEM    0x54410002
+#define ATAG_CMDLINE  0x54410009
+	
+	kernel_params = -1;
+	// We won't read more than 1k; let's make sure string will be null-terminated
+	memset((void *)SDRAM_START+CMDLINE_OFFSET,0,0x400+1);
+	
+	if (Acme_SDcard_CopyFile(KERNEL_CMDLINE,SDRAM_START+CMDLINE_OFFSET,0x400)==0) {
+		tmp = (unsigned char *)SDRAM_START + CMDLINE_OFFSET;
+		printf("Command line: %s\n\r",tmp);
+		printf("\n\r");
+		int size = strlen(tmp);
+		unsigned int *addr = (unsigned int *)SDRAM_START + (0x100>>2);
+		*addr++ = 2;
+		*addr++ = ATAG_CORE;
+		*addr++ = 4;
+		*addr++ = ATAG_MEM;
+		*addr++ = 0x4000000;   // 64Mb of memory
+		*addr++ = SDRAM_START; // at SDRAM_START
+		*addr++ = 2+(size+1+4)>>2;
+		*addr++ = ATAG_CMDLINE;
+		addr += (size+1+4)>>2;
+		*addr++ = 2;
+		*addr = ATAG_NONE;
+	}
 
 	//-------------------------------------------------------------------------
 	// Copy from the microSD to the SDRAM the Kernel image cutting the 

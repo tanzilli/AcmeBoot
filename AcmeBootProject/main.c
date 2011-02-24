@@ -47,7 +47,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.17.42"
+#define ACME_BOOTSTRAP_VERSION "1.17.43"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -733,14 +733,6 @@ int main()
 
 	printf("\n\rAcmeBoot v%s\n\r", ACME_BOOTSTRAP_VERSION);
 
-	#ifdef DATA_FLASH
-	//printf("Dataflash version\n\r");
-	#endif
-
-	#ifdef SERIAL_FLASH
-	//printf("Serialflash version\n\r");
-	#endif
-	    
 	printf("MCK = %dMHz\n\r", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 

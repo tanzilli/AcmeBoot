@@ -47,7 +47,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.17.43"
+#define ACME_BOOTSTRAP_VERSION "1.17.45"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -156,13 +156,13 @@ static void led_error(int blink_code)
 //------------------------------------------------------------------------------
 /// Jump to the first address to execute application
 //------------------------------------------------------------------------------
-static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType)
+static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsigned int kernelParams)
 {
-	typedef void(*fctType)(volatile unsigned int, volatile unsigned int);
-	void(*pFct)(volatile unsigned int r0_val, volatile unsigned int r1_val);
+	typedef void(*fctType)(volatile unsigned int, volatile unsigned int, volatile unsigned int);
+	void(*pFct)(volatile unsigned int r0_val, volatile unsigned int r1_val, volatile unsigned int r2_val);
 
 	pFct = (fctType)jumpAddr;
-	pFct(0/*dummy value in r0*/, matchType/*matchType in r1*/);
+	pFct(0/*dummy value in r0*/, matchType/*matchType in r1*/, kernelParams/*kernelParams in r2*/);
 
 	while(1); //never reach
 }
@@ -700,7 +700,7 @@ int main()
 	unsigned int page;
 
 	unsigned int kernel_params;
-	unsigned char *tmp;
+	char *tmp;
 
 	#ifdef SERIAL_FLASH
 	unsigned int jedecId;
@@ -933,24 +933,24 @@ int main()
 
 	//--------------------------------------------------------------------
 	// Add support for command line parameters in KERNEL_CMDLINE file
+	// Author: Antonio Galea
+	//
 	// Ideas borrowed from
 	// http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html
 	//-------------------------------------------------------------------------
 
 #define CMDLINE_OFFSET (0x100+(2+4+2)*4) //0x100 plus 8 32bit words
-#define ATAG_NONE     0x00000000
-#define ATAG_CORE     0x54410001
-#define ATAG_MEM    0x54410002
-#define ATAG_CMDLINE  0x54410009
+#define ATAG_NONE	0x00000000
+#define ATAG_CORE	0x54410001
+#define ATAG_MEM	0x54410002
+#define ATAG_CMDLINE	0x54410009
 	
 	kernel_params = -1;
 	// We won't read more than 1k; let's make sure string will be null-terminated
 	memset((void *)SDRAM_START+CMDLINE_OFFSET,0,0x400+1);
 	
 	if (Acme_SDcard_CopyFile(KERNEL_CMDLINE,SDRAM_START+CMDLINE_OFFSET,0x400)==0) {
-		tmp = (unsigned char *)SDRAM_START + CMDLINE_OFFSET;
-		printf("Command line: %s\n\r",tmp);
-		printf("\n\r");
+		tmp = (char *)(SDRAM_START+CMDLINE_OFFSET);
 		int size = strlen(tmp);
 		unsigned int *addr = (unsigned int *)SDRAM_START + (0x100>>2);
 		*addr++ = 2;
@@ -983,7 +983,7 @@ int main()
 	printf("Jump to Kernel\n\r");
 
 	//GoToJumpAddress(0x20008000, MACH_TYPE);
-	GoToJumpAddress(0x20008000, 3129);
+	GoToJumpAddress(0x20008000, 3129, kernel_params);
 
 	led_error(FLASH_WRITE_ERROR);
 	return 0;

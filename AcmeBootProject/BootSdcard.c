@@ -161,9 +161,9 @@ int Acme_SDcard_CopyFile(char *filename,unsigned long destination,unsigned long 
         printf("microSD not found\n\r");
         return 1;
     }
-	SD_DisplaySdStatus(&medias[ID_DRV]);
+    SD_DisplaySdStatus(&medias[ID_DRV]);
     
-	memset(&fs, 0, sizeof(FATFS));  // Clear file system object    
+    memset(&fs, 0, sizeof(FATFS));  // Clear file system object    
     res = f_mount(0, &fs);
     if( res != FR_OK ) {
         printf("f_mount pb: 0x%X\n\r", res);
@@ -197,7 +197,6 @@ int Acme_SDcard_CopyFile(char *filename,unsigned long destination,unsigned long 
         printf("f_close pb: 0x%X\n\r", res);
         return 1;
     }
-    
     return 0;
 }
 

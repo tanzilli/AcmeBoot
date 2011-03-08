@@ -90,6 +90,7 @@ Media medias[MAX_LUNS];
 
 FRESULT res;
     
+#if 0
 int BOOT_SDcard_CopyFile(const Tdesc *pTd, unsigned char nbTd)
 {
     unsigned int ByteToRead;
@@ -99,14 +100,14 @@ int BOOT_SDcard_CopyFile(const Tdesc *pTd, unsigned char nbTd)
     #if defined(BOARD_SD_BOOT_MCISLOT)
     MEDSdcard_Initialize(&medias[ID_DRV], BOARD_SD_BOOT_MCISLOT);
     #else
-    printf("-E- SD boot slot is not defined.\n\r");
+     printf("-E- SD boot slot is not defined.\n\r");
     return 1;
     #endif
 
     memset(&fs, 0, sizeof(FATFS));  // Clear file system object    
     res = f_mount(0, &fs);
     if( res != FR_OK ) {
-        printf("f_mount pb: 0x%X\n\r", res);
+        // printf("f_mount pb: 0x%X\n\r", res);
         return 0;
     }
 
@@ -149,6 +150,7 @@ int BOOT_SDcard_CopyFile(const Tdesc *pTd, unsigned char nbTd)
     
     return 0;
 }
+#endif
 
 
 int Acme_SDcard_Init(void)

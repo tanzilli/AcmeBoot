@@ -626,7 +626,7 @@ void MEDSdcard_EraseAll(Media *media)
          block += multiBlock) {
 
         error = SD_WriteBlock((SdCard*)media->interface, block, multiBlock, buffer);
-        ASSERT(!error, "\n\r-F- Failed to write block (%d) #%u\n\r", error, block);  
+        //ASSERT(!error, "\n\r-F- Failed to write block (%d) #%u\n\r", error, block);  
     }
 }
 
@@ -644,7 +644,7 @@ void MEDSdcard_EraseBlock(Media *media, unsigned int block)
     memset(buffer, 0, media->blockSize);
     
     error = SD_WriteBlock((SdCard*)media->interface, block, 1, buffer);
-    ASSERT(!error, "\n\r-F- Failed to write block (%d) #%u\n\r", error, block);  
+    //ASSERT(!error, "\n\r-F- Failed to write block (%d) #%u\n\r", error, block);  
 }
 
 //------------------------------------------------------------------------------

@@ -4,6 +4,8 @@
  * Sergio Tanzilli - tanzilli@acmesystems.it
  * Roberto Asquini - asquini@acmesystems.it
  * Luca Pascarella - pascarella@acmesystems.it
+ * Claudio Mignanti - mignanti@acmesystems.it
+ * Antonio Galea - antonio.galea@gmail.com
  *
  * http://www.acmesystems.it
  * http://foxg20.acmesystems.it/doku.php?id=dev:acmeboot
@@ -47,13 +49,16 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.18.rc8"
+#define ACME_BOOTSTRAP_VERSION "1.18.rc9"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
  *
  * 1.18 Read the Kernel CMDLINE configuration from the file cmdline.txt
+ *      on the first microSD partition
+ *
+ *      Read the MACHTYPE from the file machtype.txt
  *      on the first microSD partition
  *
  * 1.17 Led red blinks again (like the < 1.16 version ) when 
@@ -136,9 +141,8 @@ static void blink_delay(void)
 {
 	int volatile delay_counter=0;
 
-	while (delay_counter<1000000) {
+	while (delay_counter<1000000) 
 		delay_counter++;
-	}
 }
 
 static void led_error(int blink_code)
@@ -170,7 +174,6 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 
 	while(1); //never reach
 }
-
 
 #define be32_to_cpu(a) ((a)[0] << 24 | (a)[1] << 16 | (a)[2] << 8 | (a)[3])
 #define SDRAM_START 0x20000000
@@ -256,7 +259,6 @@ static unsigned char AT45_GetStatus(At45 *pAt45)
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_GetStatus: pAt45 is null\n\r");
-
 
 	// Issue a status register read command
 	error = AT45_SendCommand(pAt45, AT45_STATUS_READ, 1, &status, 1, 0, 0, 0);
@@ -520,7 +522,6 @@ static unsigned char AT26_Unprotect(At26 *pAt26)
 	AT26_EnableWrite(pAt26);
 	AT26_WriteStatus(pAt26, 0);
 
-
 	// Check the new status
 	if ((status & (AT26_STATUS_SPRL | AT26_STATUS_SWP)) != 0) {
 		return AT26_ERROR_PROTECTED;
@@ -723,9 +724,8 @@ int main()
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-//	printf("\nAcmeBoot v%s\n", ACME_BOOTSTRAP_VERSION);
-
-//	printf("MCK = %dMHz\n", (int)(BOARD_MCK/1000000));
+	printf("\nAcmeBoot %s\n", ACME_BOOTSTRAP_VERSION);
+	printf("MCK = %dMHz\n", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 
 	// value of 20 aug 2010 11:49
@@ -767,7 +767,7 @@ int main()
 	printf("%s found\n", at45.pDesc->name);
 
 	// Output JEDEC identifier of device
-	//printf("Device identifier: 0x%08X\n\r", AT45_GetJedecId(&at45));
+	printf("Flash id: 0x%08X\n\r", AT45_GetJedecId(&at45));
 
 	// Get device parameters
 	numPages = AT45_PageNumber(&at45);
@@ -788,9 +788,9 @@ int main()
 	// Read the JEDEC ID of the device to identify it
 	jedecId = AT26_ReadJedecId(&at26);
 	if (AT26_FindDevice(&at26, jedecId)) {
-//		printf("%s found\n", AT26_Name(&at26));
+		printf("%s found\n", AT26_Name(&at26));
 	} else {
-//		printf("Dev unknown\n");
+		printf("Dev unknown\n");
 		for (;;);
 	}
 	//ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "-F- MAXPAGESIZE too small\n\r");
@@ -814,7 +814,7 @@ int main()
 		mm.MyMagicNumber=0x12345678;
 
 		// Erase the first 16K of dataflash
-		printf("Erasing\n");
+		 printf("Erasing\n");
 
 		#ifdef DATA_FLASH
 		for (page=0;page<(16384/pageSize+1);page++) {
@@ -865,7 +865,7 @@ int main()
 
 			for (j=0;j<pageSize;j++) {
 				if (pBuffer[j] != *(sram_address+flash_address+j)) {
-//					printf("WR:%02X RD:%02X\n",*(sram_address+flash_address+j), pBuffer[j]);
+					printf("WR:%02X RD:%02X\n",*(sram_address+flash_address+j), pBuffer[j]);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -880,9 +880,9 @@ int main()
 	// EMAC_SA1L and EMAC_SA1H
 	//-------------------------------------------------------------------------
 
-//	printf("MAC: %02X%02X%02X%02X%02X%02X\n",
-//		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
-//		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
+	printf("MAC: %02X%02X%02X%02X%02X%02X\n",
+		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
+		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
 
 	// Power ON
 	AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_EMAC;
@@ -983,7 +983,7 @@ int main()
 		mach_type_buffer[4]=0;
 		mach_type_number=(unsigned int)atoi(mach_type_buffer);
 	} 
-//	printf("%d\n",mach_type_number);
+	printf("machtype=%d\n",mach_type_number);
 
 
 	//--------------------------------------------------------------------
@@ -991,7 +991,7 @@ int main()
 	//--------------------------------------------------------------------
 
 	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,SDRAM_START+0x8000-0x40,0)!=0) {
-//		printf("%s not found\n",KERNEL_UIMAGE);
+		printf("%s not found\n",KERNEL_UIMAGE);
 		led_error(UIMAGE_NOT_FOUND);
 		// This point is never reached
 	}
@@ -1000,7 +1000,7 @@ int main()
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
-//	printf("Jump to Kernel\n");
+	printf("Jump to Kernel\n");
 
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 

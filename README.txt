@@ -1,16 +1,16 @@
-------------------------------------------------------------------------------- 
+------------------------------------------------------------------------------
 
-AcmeBoot is a tiny boot loader for the Acme Systems Linux SBC 
-FOX Board G20 (http://foxg20.acmesystems.it) made by 
+AcmeBoot is a tiny boot loader for the Acme Systems Linux SBC
+FOX Board G20 (http://foxg20.acmesystems.it) made by
 Acme Systems srl (http://www.acmesystems.it)
 
 The AcmeBoot web page is available here:
 http://foxg20.acmesystems.it/doku.php?id=dev:acmeboot
 
-------------------------------------------------------------------------------- 
+------------------------------------------------------------------------------
+HOW TO COMPILE ACMEBOOT
 
-To compile AcmeBoot you have to get the CodeSourcery toolchain 
-from this URL:
+Download the CodeSourcery toolchain from:
 http://www.codesourcery.com/sgpp/lite/arm/portal/release642
 
 Download the arm-2008q3-66-arm-none-eabi.bin 
@@ -21,24 +21,21 @@ $ ./arm-2008q3-66-arm-none-eabi.bin
 
 Follow the installation messages using the default values.
 
-------------------------------------------------------------------------------- 
+Move to AcmeBoot/AcmeBootProject
 
-To launch the AcmeBoot compilation type:
-
-cd AcmeBoot/AcmeBootProject
+Type:
 
 make dataflash
-	Compile AcmeBoot for NetusG20 with dataflash"
+  to compile AcmeBoot for NetusG20 with dataflash
 
 make serialflash
-	Compile AcmeBoot for NetusG20 with serialflash
-   
+  to compile AcmeBoot for NetusG20 with serialflash
 
-It creates the ./bin/boot-NetusG20-sdcard2sdram.bin to use with
-Pizzica In-System programming utility as illustrate on:
+The file bin/boot-NetusG20-sdcard2sdram.bin will be created.
+Use this file with Pizzica In-System programming utility 
+as illustrate on:
 http://foxg20.acmesystems.it/doku.php?id=dev:pizzica
-
-------------------------------------------------------------------------------- 
+-------------------------------------------------------------------------------
 
 AcmeBoot is based on Atmel AT91Bootstrap v.3.0
 

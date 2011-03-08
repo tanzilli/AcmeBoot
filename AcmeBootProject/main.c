@@ -49,7 +49,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.18.rc9"
+#define ACME_BOOTSTRAP_VERSION "1.18"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -724,8 +724,8 @@ int main()
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-	printf("\nAcmeBoot %s\n", ACME_BOOTSTRAP_VERSION);
-	printf("MCK = %dMHz\n", (int)(BOARD_MCK/1000000));
+	printf("\n\rAcmeBoot %s\n\r", ACME_BOOTSTRAP_VERSION);
+	printf("MCK = %dMHz\n\r", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 
 	// value of 20 aug 2010 11:49
@@ -764,7 +764,7 @@ int main()
 	while (!pDesc) {
 		pDesc = AT45_FindDevice(&at45, AT45_GetStatus(&at45));
 	}
-	printf("%s found\n", at45.pDesc->name);
+	printf("%s found\n\r", at45.pDesc->name);
 
 	// Output JEDEC identifier of device
 	printf("Flash id: 0x%08X\n\r", AT45_GetJedecId(&at45));
@@ -788,9 +788,9 @@ int main()
 	// Read the JEDEC ID of the device to identify it
 	jedecId = AT26_ReadJedecId(&at26);
 	if (AT26_FindDevice(&at26, jedecId)) {
-		printf("%s found\n", AT26_Name(&at26));
+		printf("%s found\n\r", AT26_Name(&at26));
 	} else {
-		printf("Dev unknown\n");
+		printf("Dev unknown\n\r");
 		for (;;);
 	}
 	//ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "-F- MAXPAGESIZE too small\n\r");
@@ -803,8 +803,8 @@ int main()
 	AT26_Unprotect(&at26);
 	#endif
 
-	printf("Pg #: %d\n",numPages);
-	printf("Pg s: %d\n",pageSize);
+	printf("Pg #: %d\n\r",numPages);
+	printf("Pg s: %d\n\r",pageSize);
 
 	// Check the magic number to know if has been downloaded from flash
 	// or from Pizzica
@@ -814,7 +814,7 @@ int main()
 		mm.MyMagicNumber=0x12345678;
 
 		// Erase the first 16K of dataflash
-		 printf("Erasing\n");
+		 printf("Erasing\n\r");
 
 		#ifdef DATA_FLASH
 		for (page=0;page<(16384/pageSize+1);page++) {
@@ -832,7 +832,7 @@ int main()
 		for (page=0;page<(16384/pageSize+1);page++) {
 			memcpy(pBuffer, sram_address + page * AT45_PageSize(&at45), AT45_PageSize(&at45));
 
-			printf("Write page %d\n", page);
+			printf("Write page %d\n\r", page);
 			AT45_Write(&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 			AT45_Read (&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 
@@ -840,7 +840,7 @@ int main()
 				original = *(sram_address + page * AT45_PageSize(&at45) + i);
 				copy     = *(pBuffer+i);
 				if (original != copy) {
-					printf ("WR:%02X RD:%02X\n",original,copy);
+					printf ("WR:%02X RD:%02X\n\r",original,copy);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -865,7 +865,7 @@ int main()
 
 			for (j=0;j<pageSize;j++) {
 				if (pBuffer[j] != *(sram_address+flash_address+j)) {
-					printf("WR:%02X RD:%02X\n",*(sram_address+flash_address+j), pBuffer[j]);
+					printf("WR:%02X RD:%02X\n\r",*(sram_address+flash_address+j), pBuffer[j]);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -880,7 +880,7 @@ int main()
 	// EMAC_SA1L and EMAC_SA1H
 	//-------------------------------------------------------------------------
 
-	printf("MAC: %02X%02X%02X%02X%02X%02X\n",
+	printf("MAC: %02X%02X%02X%02X%02X%02X\n\r",
 		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
 		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
 
@@ -918,7 +918,7 @@ int main()
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
 
 	if (Acme_SDcard_Init()!=0) {
-	        printf("No microSD\n");
+	        printf("No microSD\n\r");
 		led_error(MICROSD_NOT_FOUND);
 	}
 
@@ -983,7 +983,7 @@ int main()
 		mach_type_buffer[4]=0;
 		mach_type_number=(unsigned int)atoi(mach_type_buffer);
 	} 
-	printf("machtype=%d\n",mach_type_number);
+	printf("machtype=%d\n\r",mach_type_number);
 
 
 	//--------------------------------------------------------------------
@@ -991,7 +991,7 @@ int main()
 	//--------------------------------------------------------------------
 
 	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,SDRAM_START+0x8000-0x40,0)!=0) {
-		printf("%s not found\n",KERNEL_UIMAGE);
+		printf("%s not found\n\r",KERNEL_UIMAGE);
 		led_error(UIMAGE_NOT_FOUND);
 		// This point is never reached
 	}
@@ -1000,7 +1000,7 @@ int main()
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
-	printf("Jump to Kernel\n");
+	printf("Jump to Kernel\n\r");
 
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 

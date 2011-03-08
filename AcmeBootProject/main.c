@@ -47,7 +47,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.18.rc5"
+#define ACME_BOOTSTRAP_VERSION "1.18.rc8"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -256,13 +256,11 @@ static unsigned char AT45_GetStatus(At45 *pAt45)
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_GetStatus: pAt45 is null\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 
 	// Issue a status register read command
 	error = AT45_SendCommand(pAt45, AT45_STATUS_READ, 1, &status, 1, 0, 0, 0);
 	//ASSERT(!error, "-F- AT45_GetStatus: Failed to issue command.\n\r");
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for command to terminate
 	while (AT45_IsBusy(pAt45));
@@ -280,7 +278,6 @@ static void AT45_WaitReady(At45 *pAt45)
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_WaitUntilReady: pAt45 is null\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 	// Poll device until it is ready
 	while (!ready) {
@@ -299,12 +296,10 @@ static unsigned int AT45_GetJedecId(At45 *pAt45)
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_GetJedecId: pAt45 is null\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 	// Issue a manufacturer and device ID read command
 	error = AT45_SendCommand(pAt45, AT45_ID_READ, 1, (void *) &id, 4, 0, 0, 0);
 	//ASSERT(!error, "-F- AT45_GetJedecId: Could not issue command.\n\r");
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for transfer to finish
 	while (AT45_IsBusy(pAt45));
@@ -331,15 +326,12 @@ static void AT45_Read(
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_Read: pAt45 is null\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 	//ASSERT(pBuffer, "-F- AT45_Read: pBuffer is null\n\r");
-	ASSERT(pBuffer, "%d\n\r",__LINE__);
 
 	// Issue a continuous read array command
 	error = AT45_SendCommand(pAt45, AT45_CONTINUOUS_READ_LEG, 8, pBuffer, size, address, 0, 0);
 	//ASSERT(!error, "-F- AT45_Read: Failed to issue command\n\r");
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for the read command to execute
 	while (AT45_IsBusy(pAt45));
@@ -365,18 +357,14 @@ static void AT45_Write(
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_Write: pAt45 is null.\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 	//ASSERT(pBuffer, "-F- AT45_Write: pBuffer is null.\n\r");
-	ASSERT(pBuffer, "%d\n\r",__LINE__);
 
 	//ASSERT(size <= pAt45->pDesc->pageSize, "-F- AT45_Write: Size too big\n\r");
-	ASSERT(size <= pAt45->pDesc->pageSize, "%d\n\r",__LINE__);
 
 	// Issue a page write through buffer 1 command
 	error = AT45_SendCommand(pAt45, AT45_PAGE_WRITE_BUF1, 4, pBuffer, size, address, 0, 0);
 	//ASSERT(!error, "-F- AT45_Write: Could not issue command.\n\r");
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait until the command is sent
 	while (AT45_IsBusy(pAt45));
@@ -396,12 +384,10 @@ static void AT45_Erase(At45 *pAt45, unsigned int address)
 
 	// Sanity checks
 	//ASSERT(pAt45, "-F- AT45_Erase: pAt45 is null\n\r");
-	ASSERT(pAt45, "%d\n\r",__LINE__);
 
 	// Issue a page erase command.
 	error = AT45_SendCommand(pAt45, AT45_PAGE_ERASE, 4, 0, 0, address, 0, 0);
 	//ASSERT(!error, "-F- AT45_Erase: Could not issue command.\n\r");
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for end of transfer
 	while (AT45_IsBusy(pAt45));
@@ -425,7 +411,6 @@ static unsigned char AT26_ReadStatus(At26 *pAt26)
 
 	// Issue a status read command
 	error = AT26_SendCommand(pAt26, AT26_READ_STATUS, 1, &status, 1, 0, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for transfer to finish
 	while (AT26_IsBusy(pAt26));
@@ -446,7 +431,6 @@ static void AT26_WriteStatus(At26 *pAt26, unsigned char status)
 
 	// Issue a write status command
 	error = AT26_SendCommand(pAt26, AT26_WRITE_STATUS, 1, &status, 1, 0, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));
 }
@@ -481,7 +465,6 @@ static unsigned int AT26_ReadJedecId(At26 *pAt26)
 	// Issue a read ID command
 	error = AT26_SendCommand(pAt26, AT26_READ_JEDEC_ID, 1,
 		             (unsigned char *) &id, 3, 0, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for transfer to finish
 	while (AT26_IsBusy(pAt26));
@@ -502,7 +485,6 @@ static void AT26_EnableWrite(At26 *pAt26)
 
 	// Issue a write enable command
 	error = AT26_SendCommand(pAt26, AT26_WRITE_ENABLE, 1, 0, 0, 0, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
 
 	// Wait for end of transfer
 	while (AT26_IsBusy(pAt26));
@@ -570,7 +552,7 @@ static unsigned char AT26_EraseChip(At26 *pAt26)
 
 	// Erase the chip
 	error = AT26_SendCommand(pAt26, AT26_CHIP_ERASE_2, 1, 0, 0, 0, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
+	//ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));    
 	AT26_WaitReady(pAt26);
@@ -607,7 +589,7 @@ static unsigned char AT26_EraseBlock(At26 *pAt26, unsigned int address)
 
 	// Start the block erase command
 	error = AT26_SendCommand(pAt26, AT26_BLOCK_ERASE_4K, 4, 0, 0, address, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
+	//ASSERT(!error, "%d\n\r",__LINE__);
 
 	while (AT26_IsBusy(pAt26));
 	AT26_WaitReady(pAt26);
@@ -654,7 +636,7 @@ static unsigned char AT26_Write(
 		// Program page
 		error = AT26_SendCommand(pAt26, AT26_BYTE_PAGE_PROGRAM, 4,
 					pData, writeSize, address, 0, 0);
-		ASSERT(!error, "%d\n\r",__LINE__);
+		//ASSERT(!error, "%d\n\r",__LINE__);
 		while (AT26_IsBusy(pAt26));
 		AT26_WaitReady(pAt26);
 
@@ -687,7 +669,7 @@ static void AT26_Read(
 
 	// Start a read operation
 	error = AT26_SendCommand(pAt26, AT26_READ_ARRAY_LF, 4, pData, size, address, 0, 0);
-	ASSERT(!error, "%d\n\r",__LINE__);
+	//ASSERT(!error, "%d\n\r",__LINE__);
 	while (AT26_IsBusy(pAt26));
 }
 #endif
@@ -704,7 +686,6 @@ int main()
 	unsigned int pageSize;
 	unsigned int page;
 
-	unsigned int kernel_params;
 	char *tmp;
 	char mach_type_buffer[5];
 	unsigned int mach_type_number;
@@ -742,9 +723,9 @@ int main()
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-	printf("\n\rAcmeBoot v%s\n\r", ACME_BOOTSTRAP_VERSION);
+//	printf("\nAcmeBoot v%s\n", ACME_BOOTSTRAP_VERSION);
 
-	printf("MCK = %dMHz\n\r", (int)(BOARD_MCK/1000000));
+//	printf("MCK = %dMHz\n", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 
 	// value of 20 aug 2010 11:49
@@ -783,7 +764,7 @@ int main()
 	while (!pDesc) {
 		pDesc = AT45_FindDevice(&at45, AT45_GetStatus(&at45));
 	}
-	printf("%s found\n\r", at45.pDesc->name);
+	printf("%s found\n", at45.pDesc->name);
 
 	// Output JEDEC identifier of device
 	//printf("Device identifier: 0x%08X\n\r", AT45_GetJedecId(&at45));
@@ -807,14 +788,12 @@ int main()
 	// Read the JEDEC ID of the device to identify it
 	jedecId = AT26_ReadJedecId(&at26);
 	if (AT26_FindDevice(&at26, jedecId)) {
-		printf("%s found\n\r", AT26_Name(&at26));
+//		printf("%s found\n", AT26_Name(&at26));
 	} else {
-		printf("Dev unknown\n\r");
+//		printf("Dev unknown\n");
 		for (;;);
 	}
 	//ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "-F- MAXPAGESIZE too small\n\r");
-	ASSERT(MAXPAGESIZE >= AT26_PageSize(&at26), "%d\n\r",__LINE__);
-
 
 	// Get device parameters
 	numPages = AT26_PageNumber(&at26);
@@ -824,8 +803,8 @@ int main()
 	AT26_Unprotect(&at26);
 	#endif
 
-	printf("Pg #: %d\n\r",numPages);
-	printf("Pg s: %d\n\r",pageSize);
+	printf("Pg #: %d\n",numPages);
+	printf("Pg s: %d\n",pageSize);
 
 	// Check the magic number to know if has been downloaded from flash
 	// or from Pizzica
@@ -835,7 +814,7 @@ int main()
 		mm.MyMagicNumber=0x12345678;
 
 		// Erase the first 16K of dataflash
-		printf("Erasing\n\r");
+		printf("Erasing\n");
 
 		#ifdef DATA_FLASH
 		for (page=0;page<(16384/pageSize+1);page++) {
@@ -853,7 +832,7 @@ int main()
 		for (page=0;page<(16384/pageSize+1);page++) {
 			memcpy(pBuffer, sram_address + page * AT45_PageSize(&at45), AT45_PageSize(&at45));
 
-			printf("Write page %d\n\r", page);
+			printf("Write page %d\n", page);
 			AT45_Write(&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 			AT45_Read (&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 
@@ -861,7 +840,7 @@ int main()
 				original = *(sram_address + page * AT45_PageSize(&at45) + i);
 				copy     = *(pBuffer+i);
 				if (original != copy) {
-					printf ("WR:%02X RD:%02X\n\r",original,copy);
+					printf ("WR:%02X RD:%02X\n",original,copy);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -886,7 +865,7 @@ int main()
 
 			for (j=0;j<pageSize;j++) {
 				if (pBuffer[j] != *(sram_address+flash_address+j)) {
-					printf("WR:%02X RD:%02X\n\r",*(sram_address+flash_address+j), pBuffer[j]);
+//					printf("WR:%02X RD:%02X\n",*(sram_address+flash_address+j), pBuffer[j]);
 					led_error(FLASH_WRITE_ERROR);
 					// This point is never reached
 				}
@@ -901,9 +880,9 @@ int main()
 	// EMAC_SA1L and EMAC_SA1H
 	//-------------------------------------------------------------------------
 
-	printf("MAC: %02X%02X%02X%02X%02X%02X\n\r",
-		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
-		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
+//	printf("MAC: %02X%02X%02X%02X%02X%02X\n",
+//		mm.MacAddress[0], mm.MacAddress[1], mm.MacAddress[2],
+//		mm.MacAddress[3], mm.MacAddress[4], mm.MacAddress[5]);
 
 	// Power ON
 	AT91C_BASE_PMC->PMC_PCER = 1 << AT91C_ID_EMAC;
@@ -939,46 +918,57 @@ int main()
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
 
 	if (Acme_SDcard_Init()!=0) {
-	        printf("No microSD\n\r");
+	        printf("No microSD\n");
 		led_error(MICROSD_NOT_FOUND);
 	}
 
 	//--------------------------------------------------------------------
-	// Add support for command line parameters in KERNEL_CMDLINE file
-	// Author: Antonio Galea
+	// Read the command line parameters
+	//--------------------------------------------------------------------
 	//
+	// Author: Antonio Galea, Sergio Tanzilli, Claudio Mignanti
 	// Ideas borrowed from
 	// http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html
-	//-------------------------------------------------------------------------
+	//--------------------------------------------------------------------
 
-#define CMDLINE_OFFSET (0x100+(2+4+2)*4) //0x100 plus 8 32bit words
+#define ATAG_POS        SDRAM_START+0x100
+#define CMDLINE_POS	ATAG_POS+8*4	
+#define CMDLINE_LEN	0x400
+
 #define ATAG_NONE	0x00000000
 #define ATAG_CORE	0x54410001
 #define ATAG_MEM	0x54410002
 #define ATAG_CMDLINE	0x54410009
-	
-	kernel_params = -1;
+
 	// We won't read more than 1k; let's make sure string will be null-terminated
-	memset((void *)SDRAM_START+CMDLINE_OFFSET,0,0x400+1);
+	memset((void *)CMDLINE_POS,0,CMDLINE_LEN+1);
 	
-	if (Acme_SDcard_CopyFile(KERNEL_CMDLINE,SDRAM_START+CMDLINE_OFFSET,0x400)==0) {
-		tmp = (char *)(SDRAM_START+CMDLINE_OFFSET);
+	if (Acme_SDcard_CopyFile(KERNEL_CMDLINE,CMDLINE_POS,CMDLINE_LEN)==0) {
+		tmp = (char *)CMDLINE_POS;
 		int size = strlen(tmp);
-		unsigned int *addr = (unsigned int *)SDRAM_START + (0x100>>2);
+		unsigned int *addr = ATAG_POS;
+
+		// ATAG_CORE	
 		*addr++ = 2;
 		*addr++ = ATAG_CORE;
+
+		// ATAG_MEM	
 		*addr++ = 4;
 		*addr++ = ATAG_MEM;
 		*addr++ = 0x4000000;   // 64Mb of memory
-		*addr++ = SDRAM_START; // at SDRAM_START
-		*addr++ = 2+(size+1+4)>>2;
+		*addr++ = SDRAM_START; // Physical SDRAM start address
+
+		// ATAG_CMDLINE
+		*addr++ = 2 + ((size + 3) / 4);
 		*addr++ = ATAG_CMDLINE;
-		addr += (size+1+4)>>2;
+		addr += ((size + 3) / 4);
+
+		// ATAG_NONE
 		*addr++ = 2;
 		*addr = ATAG_NONE;
-	}
+	} 
 
-	//-------------------------------------------------------------------------
+	//--------------------------------------------------------------------
 	// Read the MACH_TYPE from machtype.txt
 	//
 	// 3129 = acmenetusfoxg20. Used starting from Kernel 2.6.38
@@ -986,33 +976,33 @@ int main()
 	//
 	// See ARM machine registry on:
 	// http://www.arm.linux.org.uk/developer/machines/
-	//-------------------------------------------------------------------------
+	//--------------------------------------------------------------------
 
-	//mach_type_number = 1624;
-	//if (Acme_SDcard_CopyFile(MACH_TYPE_FILE,(unsigned char *)mach_type_buffer,(unsigned long)4)==0) {
-	//	mach_type_buffer[4]=0;
-	//	mach_type_number=(unsigned int)atoi(mach_type_buffer);
-	//}
+	mach_type_number = 1624;
+	if (Acme_SDcard_CopyFile(MACH_TYPE_FILE,(unsigned char *)mach_type_buffer,(unsigned long)4)==0) {
+		mach_type_buffer[4]=0;
+		mach_type_number=(unsigned int)atoi(mach_type_buffer);
+	} 
+//	printf("%d\n",mach_type_number);
 
-	//-------------------------------------------------------------------------
-	// Copy from the microSD to the SDRAM the Kernel image cutting the 
-	// first 64 of header
-	//-------------------------------------------------------------------------
 
-	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,0x20008000-0x40,0)!=0) {
-		printf("%s not found...\n\r",KERNEL_UIMAGE);
+	//--------------------------------------------------------------------
+	// Read the Kernel image cutting the first 64 of header
+	//--------------------------------------------------------------------
+
+	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,SDRAM_START+0x8000-0x40,0)!=0) {
+//		printf("%s not found\n",KERNEL_UIMAGE);
 		led_error(UIMAGE_NOT_FOUND);
 		// This point is never reached
 	}
 
+
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
-	printf("Jump to Kernel\n\r");
+//	printf("Jump to Kernel\n");
 
-	printf("%d\n\r",mach_type_number);
-	//GoToJumpAddress(0x20008000, mach_type_number, kernel_params);
-	GoToJumpAddress(0x20008000, 3129, kernel_params);
+	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 
 	led_error(FLASH_WRITE_ERROR);
 	return 0;

@@ -49,11 +49,13 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.18"
+#define ACME_BOOTSTRAP_VERSION "1.19"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
+ *
+ * 1.19 watchdog timer enabled
  *
  * 1.18 Read the Kernel CMDLINE configuration from the file cmdline.txt
  *      on the first microSD partition

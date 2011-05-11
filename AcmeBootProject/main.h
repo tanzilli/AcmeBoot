@@ -66,6 +66,7 @@ extern int BOOT_NAND_CopyBin(const Tdesc *pTd, unsigned char nbTd);
 extern int BOOT_NOR_CopyBin(const Tdesc *pTd, unsigned char nbTd);
 extern int BOOT_SDcard_CopyFile(const Tdesc *pTd, unsigned char nbTd);
 extern int Acme_SDcard_CopyFile(char *filename,unsigned long destination,unsigned long size);
+extern void Acme_SDcard_Stop();
 
 extern int BOOT_EEPROM_CopyBin(const Tdesc *pTd, unsigned char nbTd);
 

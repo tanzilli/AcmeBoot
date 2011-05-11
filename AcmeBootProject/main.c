@@ -49,7 +49,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.19"
+#define ACME_BOOTSTRAP_VERSION "1.19.1"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -102,6 +102,7 @@
 #include <memories/spi-flash/at26.h>
 #include <spi-flash/at45.h>
 #include <peripherals/rstc/rstc.h>
+#include <peripherals/mci/mci.h>
 #include <string.h>
 
 #include "main.h"
@@ -1022,6 +1023,9 @@ int main()
 
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
+
+        //SW Reset of SD card reader
+        Acme_SDcard_Stop();
 
 	printf("Jump to Kernel\n\r");
 

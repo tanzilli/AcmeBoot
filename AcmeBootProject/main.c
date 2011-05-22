@@ -693,7 +693,7 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
-        char watchdog_buffer[1];
+        char watchdog_buffer;
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -997,17 +997,13 @@ int main()
         // 1 - enabled
         // if the file is missing the watchdog will be enabled
 	//--------------------------------------------------------------------
-
-	if (Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)watchdog_buffer,(unsigned long)1)==0) {
-		watchdog_buffer[1]=0;
-		if((unsigned int)atoi(watchdog_buffer)==0){
-                  AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
-	          printf("watchdog disabled\n\r");
-                }else{
-	          printf("watchdog enabled\n\r");
-                }
-	}else{ 
-	        printf("watchdog enabled\n\r");
+        watchdog_buffer='1';
+	Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)&watchdog_buffer,(unsigned long)1);
+	if(watchdog_buffer=='0'){
+          AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
+	  printf("watchdog disabled\n\r");
+        }else{
+	  printf("watchdog enabled\n\r");
         }
 
 	//--------------------------------------------------------------------

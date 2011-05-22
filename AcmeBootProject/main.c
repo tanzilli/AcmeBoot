@@ -182,6 +182,7 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 #define KERNEL_UIMAGE	"uImage"
 #define KERNEL_CMDLINE	"cmdline.txt"
 #define MACH_TYPE_FILE 	"machtype.txt"
+#define WATCHDOG_FILE 	"watchdog.txt"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -691,6 +692,7 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
+        char watchdog_buffer[1];
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -987,6 +989,25 @@ int main()
 	} 
 	printf("machtype=%d\n\r",mach_type_number);
 
+
+	//--------------------------------------------------------------------
+	// Read the requested watchdog state from watchdog.txt
+	// 0 - disabled
+        // 1 - enabled
+        // if the file is missing the watchdog will be enabled
+	//--------------------------------------------------------------------
+
+	if (Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)watchdog_buffer,(unsigned long)1)==0) {
+		watchdog_buffer[1]=0;
+		if((unsigned int)atoi(watchdog_buffer)==0){
+                  AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
+	          printf("watchdog disabled\n\r");
+                }else{
+	          printf("watchdog enabled\n\r");
+                }
+	}else{ 
+	        printf("watchdog enabled\n\r");
+        }
 
 	//--------------------------------------------------------------------
 	// Read the Kernel image cutting the first 64 of header

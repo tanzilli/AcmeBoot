@@ -366,6 +366,7 @@
 /// Chip select pin connected to the dataflash.
 #define BOARD_AT26_B_NPCS_PIN         PIN_SPI0_NPCS1
 
+#if defined(ORIGIN_SD_PORT_MCI0)
 /// Base address of the MCI peripheral connected to the SD card.
 #define BOARD_SD_MCI_BASE           AT91C_BASE_MCI
 /// Peripheral identifier of the MCI connected to the SD card.
@@ -379,28 +380,32 @@
 //#define BOARD_SD_SLOT		    (AT91C_MCI_SCDSEL_SLOTB | AT91C_MCI_SCDBUS_1BIT)
 #define BOARD_SD_BOOT_MCISLOT    0
 
+#else
+
 //#if defined(ORIGIN_SD_PORT_MCI1)
 //#undef BOARD_SD_MCI_BASE
-//#define BOARD_SD_MCI_BASE           AT91C_BASE_MCI
+#define BOARD_SD_MCI_BASE           AT91C_BASE_MCI
 //#undef BOARD_SD_MCI_ID
-//#define BOARD_SD_MCI_ID             AT91C_ID_MCI
+#define BOARD_SD_MCI_ID             AT91C_ID_MCI
 //#undef BOARD_SD_PINS
-//#define BOARD_SD_PINS               PINS_MCI1
+#define BOARD_SD_PINS               PINS_MCI1
 //#undef BOARD_SD_SLOT
-//#define BOARD_SD_SLOT               MCI_SD_SLOTA
+#define BOARD_SD_SLOT               MCI_SD_SLOTA
 //#endif
 
 /// Second MCI slot to which the SD card is connected to.
-// #define BOARD_SD_MCI1_SLOT          MCI_SD_SLOTA
+#define BOARD_SD_MCI1_SLOT          MCI_SD_SLOTA
 /// SD boot slot
-// #define BOARD_SD_BOOT_MCISLOT    1
+#define BOARD_SD_BOOT_MCISLOT    1
 /// SD card detection pin definition.
-//#define BOARD_SD_PIN_CD     {1 << 9, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INPUT, PIO_PULLUP}
+#define BOARD_SD_PIN_CD     {1 << 9, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INPUT, PIO_PULLUP}
 
 /// Second MCI slot Peripheral identifier
-// #define BOARD_SD_MCI1_ID            AT91C_ID_MCI
+#define BOARD_SD_MCI1_ID            AT91C_ID_MCI
 /// Base address of the second MCI peripheral connected to the SD card.
-// #define BOARD_SD_MCI1_BASE          AT91C_BASE_MCI
+#define BOARD_SD_MCI1_BASE          AT91C_BASE_MCI
+
+#endif 
 
 /// Base address of the SPI peripheral connected to the SD card.
 #define BOARD_SD_SPI_BASE   AT91C_BASE_SPI0

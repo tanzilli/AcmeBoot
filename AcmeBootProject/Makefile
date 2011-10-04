@@ -33,14 +33,24 @@ dataflash:
 	export RUN=1
 	make CHIP=at91sam9g20 BOARD=NetusG20 \
 		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
-		FLASH_MEMORY=data_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		ORIGIN_SD_PORT_MCI1=1 \
+		FLASH_MEMORY=data_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=0 \
 		clean all
 
 serialflash:
 	export RUN=1
 	make CHIP=at91sam9g20 BOARD=NetusG20 \
 		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
+		ORIGIN_SD_PORT_MCI1=1 \
 		FLASH_MEMORY=serial_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		clean all
+
+sdcard:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
+		ORIGIN_SD_PORT_MCI1=1 \
+		DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
 		clean all
 
 #-------------------------------------------------------------------------------

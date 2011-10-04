@@ -49,7 +49,7 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.19"
+#define ACME_BOOTSTRAP_VERSION "1.19.1"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
@@ -102,6 +102,7 @@
 #include <memories/spi-flash/at26.h>
 #include <spi-flash/at45.h>
 #include <peripherals/rstc/rstc.h>
+#include <peripherals/mci/mci.h>
 #include <string.h>
 
 #include "main.h"
@@ -182,6 +183,7 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 #define KERNEL_UIMAGE	"uImage"
 #define KERNEL_CMDLINE	"cmdline.txt"
 #define MACH_TYPE_FILE 	"machtype.txt"
+#define WATCHDOG_FILE 	"watchdog.txt"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -691,6 +693,7 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
+        char watchdog_buffer;
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -989,6 +992,21 @@ int main()
 
 
 	//--------------------------------------------------------------------
+	// Read the requested watchdog state from watchdog.txt
+	// 0 - disabled
+        // 1 - enabled
+        // if the file is missing the watchdog will be enabled
+	//--------------------------------------------------------------------
+        watchdog_buffer='1';
+	Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)&watchdog_buffer,(unsigned long)1);
+	if(watchdog_buffer=='0'){
+          AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
+	  printf("watchdog disabled\n\r");
+        }else{
+	  printf("watchdog enabled\n\r");
+        }
+
+	//--------------------------------------------------------------------
 	// Read the Kernel image cutting the first 64 of header
 	//--------------------------------------------------------------------
 
@@ -1001,6 +1019,9 @@ int main()
 
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
+
+        //SW Reset of SD card reader
+        Acme_SDcard_Stop();
 
 	printf("Jump to Kernel\n\r");
 

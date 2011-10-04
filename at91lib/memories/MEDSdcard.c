@@ -40,6 +40,7 @@
 #include <utility/assert.h>
 #include <utility/math.h>
 #include <memories/sdmmc/sdmmc_mci.h>
+#include <boards/NetusG20/board.h>
 #if defined(MCI2_INTERFACE)
 #include "dmad/dmad.h"
 #endif
@@ -438,7 +439,13 @@ unsigned char MEDSdcard_Detect(Media * media, unsigned char mciID)
 {
     return CardIsConnected(mciID);
 }
-
+//------------------------------------------------------------------------------
+/// Stop the SDcard (bring it into a known state)
+//------------------------------------------------------------------------------
+void MEDSdcard_Stop()
+{
+  SD_Stop(sdDrv, (SdDriver *)mciDrv);
+}
 //------------------------------------------------------------------------------
 /// Initializes a Media instance and the associated physical interface
 /// \param  media Pointer to the Media instance to initialize

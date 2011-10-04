@@ -31,6 +31,10 @@ make dataflash
 make serialflash
   to compile AcmeBoot for NetusG20 with serialflash
 
+If you want to specify a different compiler path simple append the string
+	CROSS_COMPILE=/path/to/arm-none-eabi-
+to the above make commands.
+
 The file bin/boot-NetusG20-sdcard2sdram.bin will be created.
 Use this file with Pizzica In-System programming utility 
 as illustrate on:

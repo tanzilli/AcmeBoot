@@ -163,7 +163,7 @@ static void led_error(int blink_code)
 		for (blink_counter=0;blink_counter<blink_code;blink_counter++) {
 			PIO_Clear(&foxg20_red_led);
 			blink_delay();
-			PIO_Set(&foxg20_red_led);			
+			PIO_Set(&foxg20_red_led);
 			blink_delay();
 		}
 		for (i=0;i<10;i++) blink_delay();
@@ -722,7 +722,7 @@ int main()
 	PIO_Configure(&foxg20_pc5, 1);
 	PIO_Configure(&foxg20_pc10, 1);
 
-	PIO_Clear(&foxg20_red_led);			
+	PIO_Clear(&foxg20_red_led);
 
 	// Save the length of SRAM (16K) on the 6th vector. In this way when this
 	// code is saved on Data or Serial flash is managed as a boot file
@@ -943,7 +943,7 @@ int main()
 	//--------------------------------------------------------------------
 
 #define ATAG_POS        SDRAM_START+0x100
-#define CMDLINE_POS	ATAG_POS+8*4	
+#define CMDLINE_POS	ATAG_POS+8*4
 #define CMDLINE_LEN	0x400
 
 #define ATAG_NONE	0x00000000

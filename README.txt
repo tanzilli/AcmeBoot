@@ -31,6 +31,10 @@ make dataflash
 make serialflash
   to compile AcmeBoot for NetusG20 with serialflash
 
+make sdcard
+  to compile AcmeBoot suitable to boot from sdcard
+	(experimental)
+
 If you want to specify a different compiler path simple append the string
 	CROSS_COMPILE=/path/to/arm-none-eabi-
 to the above make commands.

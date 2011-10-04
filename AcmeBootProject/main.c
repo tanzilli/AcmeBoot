@@ -49,11 +49,17 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.19.1"
+#define ACME_BOOTSTRAP_VERSION "1.21"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
+ *
+ * 1.21 Disable debug information about machtype and watchdog on the dataflash.
+ *
+ * 1.20 Propagate SD_Stop() to work well with any microSD brand
+ *      Deleted the code to read watchdog.txt because too large to be
+ *      fixed in 16KB.
  *
  * 1.19 watchdog timer enabled
  *
@@ -988,23 +994,22 @@ int main()
 		mach_type_buffer[4]=0;
 		mach_type_number=(unsigned int)atoi(mach_type_buffer);
 	} 
-	printf("machtype=%d\n\r",mach_type_number);
 
 
 	//--------------------------------------------------------------------
 	// Read the requested watchdog state from watchdog.txt
 	// 0 - disabled
-        // 1 - enabled
-        // if the file is missing the watchdog will be enabled
+	// 1 - enabled
+	// if the file is missing the watchdog will be enabled
 	//--------------------------------------------------------------------
-        watchdog_buffer='1';
+	watchdog_buffer='1';
 	Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)&watchdog_buffer,(unsigned long)1);
 	if(watchdog_buffer=='0'){
-          AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
-	  printf("watchdog disabled\n\r");
-        }else{
-	  printf("watchdog enabled\n\r");
-        }
+		AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
+	}
+	#ifndef DATA_FLASH
+	printf("machtype=%d watchdog status=%d\n\r",mach_type_number, watchdog_buffer);
+	#endif
 
 	//--------------------------------------------------------------------
 	// Read the Kernel image cutting the first 64 of header

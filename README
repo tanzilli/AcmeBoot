@@ -41,12 +41,16 @@ The file bin/boot-NetusG20-sdcard2sdram_for_XXX.bin will be created.
 
 HOW TO USE ACMEBOOT
 -------------------
-Using those files with Pizzica In-System programming utility you can flash the new
-boorloader on Netus as illustrate on:
+If you are using a NetusG20 with serialflash or dataflash onboard you can use the
+Pizzica In-System programming utility to flash the appropriate file as illustrate on:
 http://www.acmesystems.it/?id=pizzica
 
-For example:
+For example for a dataflash board:
 	$ python pizzica.py -f bin/boot-NetusG20-sdcard2sdram_for_data_flash -d /dev/ttyUSB0
+
+If you have a FoxBoardG20 v2 you can also use the first sdcard to store the bootloader
+than you should copy the bin/boot-NetusG20-sdcard2sdram_for_sdcard.bin
+in the first fat16 partion renaming it as boot.bin. (experimental)
 
 CREDITS
 -------

@@ -105,7 +105,7 @@ OBJ = obj
 
 # Default output file basename (if not defined by user)
 #-------------------------------------------------------------------------------
-BOOTNAME_BASE = boot-$(BOARD)-$(ORIGIN)2$(DESTINATION)
+BOOTNAME_BASE = boot-$(BOARD)-$(ORIGIN)2$(DESTINATION)_for_$(FLASH_MEMORY)
 
 ifndef    FPGAINIT
 FPGAINIT = 0

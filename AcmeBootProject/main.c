@@ -1015,12 +1015,14 @@ int main()
 	// Read the Kernel image cutting the first 64 of header
 	//--------------------------------------------------------------------
 
-	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,SDRAM_START+0x8000-0x40,0)!=0) {
-		printf("%s not found\n\r",KERNEL_UIMAGE);
-		led_error(UIMAGE_NOT_FOUND);
-		// This point is never reached
-	}
+	/* Here a very old consideration. In the early time the kernel from uboot
+	 was prefixed by a header that is useless from LONG time. If the uImage is not
+	 found try the legacy Image kernel !!! */
 
+	if (Acme_SDcard_CopyFile(KERNEL_UIMAGE,SDRAM_START+0x8000-0x40,0)!=0) {
+		if (Acme_SDcard_CopyFile("Image",SDRAM_START+0x8000,0)==1)
+			led_error(UIMAGE_NOT_FOUND);
+	}
 
 	// Red led off
 	PIO_Clear(&foxg20_red_led);

@@ -21,7 +21,7 @@
  */
 
 /* ----------------------------------------------------------------------------
- *         ATMEL Microcontroller Software Support
+ *	 ATMEL Microcontroller Software Support
  * ----------------------------------------------------------------------------
  * Copyright (c) 2008, Atmel Corporation
  *
@@ -93,7 +93,7 @@
  */
 
 //------------------------------------------------------------------------------
-//         Headers
+//	 Headers
 //------------------------------------------------------------------------------
 
 #include <board.h>
@@ -192,7 +192,7 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 #define WATCHDOG_FILE 	"watchdog.txt"
 
 //------------------------------------------------------------------------------
-//         Internal definitions
+//	 Internal definitions
 //------------------------------------------------------------------------------
 
 #define MAXPAGESIZE     1056
@@ -202,25 +202,25 @@ static unsigned char pBuffer[MAXPAGESIZE];
 
 #ifdef SERIAL_FLASH
 /// Maximum device page size in bytes.
-#define SPI_BASE    AT91C_BASE_SPI0             // Address of the SPI peripheral connected to the AT26.
-#define SPI_ID      AT91C_ID_SPI0               // Peripheral identifier of the SPI connected to the AT26.
-#define SPI_CS      1                           // Chip select value used to select the AT26 chip.
+#define SPI_BASE    AT91C_BASE_SPI0	     // Address of the SPI peripheral connected to the AT26.
+#define SPI_ID      AT91C_ID_SPI0	       // Peripheral identifier of the SPI connected to the AT26.
+#define SPI_CS      1			   // Chip select value used to select the AT26 chip.
 #define SPI_PINS    PINS_SPI0, PIN_SPI0_NPCS1   // SPI peripheral pins to configure to access the serial flash.
 #endif
 
 
 #ifdef DATA_FLASH
 /// SPI clock frequency, in Hz.
-#define SPCK        1000000
-#define BOARD_AT45_SPI_BASE           AT91C_BASE_SPI0
-#define BOARD_AT45_SPI_ID             AT91C_ID_SPI0
-#define BOARD_AT45_SPI_PINS           PINS_SPI0
-#define BOARD_AT45_NPCS_PIN           PIN_SPI0_NPCS1
-#define BOARD_AT45_NPCS               1
+#define SPCK	1000000
+#define BOARD_AT45_SPI_BASE	   AT91C_BASE_SPI0
+#define BOARD_AT45_SPI_ID	     AT91C_ID_SPI0
+#define BOARD_AT45_SPI_PINS	   PINS_SPI0
+#define BOARD_AT45_NPCS_PIN	   PIN_SPI0_NPCS1
+#define BOARD_AT45_NPCS	       1
 #endif
 
 //------------------------------------------------------------------------------
-//         Internal variables
+//	 Internal variables
 //------------------------------------------------------------------------------
 
 /// SPI driver instance.
@@ -243,7 +243,7 @@ static const Pin pins[]  = {BOARD_AT45_SPI_PINS, BOARD_AT45_NPCS_PIN};
 #endif
 
 //------------------------------------------------------------------------------
-//         Internal functions
+//	 Internal functions
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -476,7 +476,7 @@ static unsigned int AT26_ReadJedecId(At26 *pAt26)
 
 	// Issue a read ID command
 	error = AT26_SendCommand(pAt26, AT26_READ_JEDEC_ID, 1,
-		             (unsigned char *) &id, 3, 0, 0, 0);
+			     (unsigned char *) &id, 3, 0, 0, 0);
 
 	// Wait for transfer to finish
 	while (AT26_IsBusy(pAt26));
@@ -699,7 +699,7 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
-        char watchdog_buffer;
+	char watchdog_buffer;
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -906,12 +906,12 @@ int main()
 
 	// Set the MAC address
 	AT91C_BASE_EMACB->EMAC_SA1L = ( ((unsigned int)mm.MacAddress[3] << 24)
-		                 | ((unsigned int)mm.MacAddress[2] << 16)
-		                 | ((unsigned int)mm.MacAddress[1] << 8 )
-		                 |                mm.MacAddress[0] );
+				 | ((unsigned int)mm.MacAddress[2] << 16)
+				 | ((unsigned int)mm.MacAddress[1] << 8 )
+				 |		mm.MacAddress[0] );
 
 	AT91C_BASE_EMACB->EMAC_SA1H = ( ((unsigned int)mm.MacAddress[5] << 8 )
-		                 |                mm.MacAddress[4] );
+				 |		mm.MacAddress[4] );
 
 	AT91C_BASE_EMACB->EMAC_NCR = AT91C_EMAC_CLRSTAT;
 
@@ -929,7 +929,7 @@ int main()
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
 
 	if (Acme_SDcard_Init()!=0) {
-	        printf("No microSD\n\r");
+		printf("No microSD\n\r");
 		led_error(MICROSD_NOT_FOUND);
 	}
 
@@ -942,7 +942,7 @@ int main()
 	// http://www.simtec.co.uk/products/SWLINUX/files/booting_article.html
 	//--------------------------------------------------------------------
 
-#define ATAG_POS        SDRAM_START+0x100
+#define ATAG_POS	SDRAM_START+0x100
 #define CMDLINE_POS	ATAG_POS+8*4
 #define CMDLINE_LEN	0x400
 
@@ -1025,8 +1025,8 @@ int main()
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
-        //SW Reset of SD card reader
-        Acme_SDcard_Stop();
+	//SW Reset of SD card reader
+	Acme_SDcard_Stop();
 
 	printf("Jump to Kernel\n\r");
 

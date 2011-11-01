@@ -1,0 +1,55 @@
+AcmeBoot is a tiny boot loader for the Acme Systems Linux SBC
+FOX Board G20 (http://www.acmesystems.it/?id=FOXG20) made by
+Acme Systems srl (http://www.acmesystems.it)
+
+The AcmeBoot web page is available here:
+http://www.acmesystems.it/?id=acmeboot
+
+
+HOW TO COMPILE ACMEBOOT
+-----------------------
+Download the CodeSourcery toolchain from:
+http://www.codesourcery.com/sgpp/lite/arm/portal/release642
+
+Download the arm-2008q3-66-arm-none-eabi.bin 
+file on your home directory and install it typing:
+
+chmod +x arm-2008q3-66-arm-none-eabi.bin 
+$ ./arm-2008q3-66-arm-none-eabi.bin
+
+Follow the installation messages using the default values.
+
+Move to AcmeBoot/AcmeBootProject
+
+Type on of the following as need:
+
+make dataflash
+  to compile AcmeBoot for NetusG20 with dataflash
+
+make serialflash
+  to compile AcmeBoot for NetusG20 with serialflash
+
+make sdcard
+  to compile AcmeBoot suitable to boot from sdcard
+	(experimental)
+
+If you want to specify a different compiler path simple append the string
+	CROSS_COMPILE=/path/to/arm-none-eabi-
+to the above make commands.
+
+The file bin/boot-NetusG20-sdcard2sdram_for_XXX.bin will be created.
+
+HOW TO USE ACMEBOOT
+-------------------
+Using those files with Pizzica In-System programming utility you can flash the new
+boorloader on Netus as illustrate on:
+http://www.acmesystems.it/?id=pizzica
+
+For example:
+	$ python pizzica.py -f bin/boot-NetusG20-sdcard2sdram_for_data_flash -d /dev/ttyUSB0
+
+CREDITS
+-------
+AcmeBoot is based on Atmel AT91Bootstrap v.3.0
+See README.atmel for more info.
+

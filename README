@@ -10,18 +10,20 @@ HOW TO COMPILE ACMEBOOT
 -----------------------
 Download the CodeSourcery toolchain from:
 http://www.codesourcery.com/sgpp/lite/arm/portal/release642
-
-Download the arm-2008q3-66-arm-none-eabi.bin 
-file on your home directory and install it typing:
-
-chmod +x arm-2008q3-66-arm-none-eabi.bin 
-$ ./arm-2008q3-66-arm-none-eabi.bin
+in detail download arm-2008q3-66-arm-none-eabi.bin file on your home directory
+and install it typing:
+  $ chmod +x arm-2008q3-66-arm-none-eabi.bin
+  $ ./arm-2008q3-66-arm-none-eabi.bin
 
 Follow the installation messages using the default values.
 
+If you prefer to recompile your own bare-metal toolchain, or you need a 64bit version,
+I can suggest the use of summon-arm-toolchain script available here:
+   * https://github.com/esden/summon-arm-toolchain
+
 Move to AcmeBoot/AcmeBootProject
 
-Type on of the following as need:
+Type:
 
 make dataflash
   to compile AcmeBoot for NetusG20 with dataflash

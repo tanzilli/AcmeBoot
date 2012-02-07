@@ -367,12 +367,13 @@
 #define BOARD_AT26_B_NPCS_PIN         PIN_SPI0_NPCS1
 
 #ifdef ORIGIN_SD_PORT_MCI1
+	/* FoxG20 v1 and Foxg20v2 with legacy sdcard */
 	/// Base address of the MCI peripheral connected to the SD card.
 	#define BOARD_SD_MCI_BASE           AT91C_BASE_MCI
 	/// Peripheral identifier of the MCI connected to the SD card.
 	#define BOARD_SD_MCI_ID             AT91C_ID_MCI
 	/// MCI pins that shall be configured to access the SD card.
-	#define BOARD_SD_PINS               MCI_SD_SLOTB
+	#define BOARD_SD_PINS               PINS_MCI
 	/// Second MCI slot pins
 	#define BOARD_SD_MCI1_PINS          PINS_MCI1
 	/// MCI slot to which the SD card is connected to.
@@ -381,23 +382,22 @@
 	#define BOARD_SD_BOOT_MCISLOT    0
 
 #else
-
-//#if defined(ORIGIN_SD_PORT_MCI1)
-	//#undef BOARD_SD_MCI_BASE
+	/* Foxg20v2 second boot sdcard */
+	#undef BOARD_SD_MCI_BASE
 	#define BOARD_SD_MCI_BASE           AT91C_BASE_MCI
-	//#undef BOARD_SD_MCI_ID
+	#undef BOARD_SD_MCI_ID
 	#define BOARD_SD_MCI_ID             AT91C_ID_MCI
-	//#undef BOARD_SD_PINS
+	#undef BOARD_SD_PINS
 	#define BOARD_SD_PINS               PINS_MCI1
-	//#undef BOARD_SD_SLOT
+	#undef BOARD_SD_SLOT
 	#define BOARD_SD_SLOT               MCI_SD_SLOTA
-//#endif
 	#define BOARD_SD_MCI1_SLOT          MCI_SD_SLOTA
 	#define BOARD_SD_BOOT_MCISLOT    1
-	//#define BOARD_SD_PIN_CD     {1 << 9, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INPUT, PIO_PULLUP}
 	#define BOARD_SD_MCI1_ID            AT91C_ID_MCI
 	#define BOARD_SD_MCI1_BASE          AT91C_BASE_MCI
+
 #endif
+
 
 /// Base address of the SPI peripheral connected to the SD card.
 #define BOARD_SD_SPI_BASE   AT91C_BASE_SPI0

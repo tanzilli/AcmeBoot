@@ -33,7 +33,7 @@
 
 #include "math.h"
 #include "trace.h"
-
+#ifdef SERIAL_FLASH
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
@@ -88,4 +88,5 @@ unsigned int power(unsigned int x, unsigned int y)
     } 
     return result;
 }
+#endif
 

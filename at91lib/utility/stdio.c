@@ -422,7 +422,7 @@ signed int vsprintf(char *pString, const char *pFormat, va_list ap)
 signed int vfprintf(FILE *pStream, const char *pFormat, va_list ap)
 {
     char pStr[MAX_STRING_SIZE];
-    char pError[] = "stdio.c: increase MAX_STRING_SIZE\n\r";
+    char pError[] = "low MAX_STRING_SIZE\n\r";
 
     // Write formatted string in buffer
     if (vsprintf(pStr, pFormat, ap) >= MAX_STRING_SIZE) {

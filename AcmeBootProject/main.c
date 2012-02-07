@@ -755,7 +755,6 @@ int main()
 
 	// SDRAM
 	#if defined(DESTINATION_sdram)
-	//printf("Init SDRAM\n\r");
 	BOARD_ConfigureSdram(BOARD_SDRAM_BUSWIDTH);
 	#endif
 
@@ -775,10 +774,6 @@ int main()
 	while (!pDesc) {
 		pDesc = AT45_FindDevice(&at45, AT45_GetStatus(&at45));
 	}
-	printf("%s found\n\r", at45.pDesc->name);
-
-	// Output JEDEC identifier of device
-	printf("Flash id: 0x%08X\n\r", AT45_GetJedecId(&at45));
 
 	// Get device parameters
 	numPages = AT45_PageNumber(&at45);
@@ -812,10 +807,10 @@ int main()
 
 	//Unprotected the flash
 	AT26_Unprotect(&at26);
-	#endif
 
 	printf("Pg #: %d\n\r",numPages);
 	printf("Pg s: %d\n\r",pageSize);
+	#endif
 
 	// Check the magic number to know if has been downloaded from flash
 	// or from Pizzica
@@ -825,7 +820,7 @@ int main()
 		mm.MyMagicNumber=0x12345678;
 
 		// Erase the first 16K of dataflash
-		 printf("Erasing\n\r");
+		 printf("Erasing\n");
 
 		#ifdef DATA_FLASH
 		for (page=0;page<(16384/pageSize+1);page++) {
@@ -843,7 +838,6 @@ int main()
 		for (page=0;page<(16384/pageSize+1);page++) {
 			memcpy(pBuffer, sram_address + page * AT45_PageSize(&at45), AT45_PageSize(&at45));
 
-			printf("Write page %d\n\r", page);
 			AT45_Write(&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 			AT45_Read (&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 
@@ -929,7 +923,7 @@ int main()
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
 
 	if (Acme_SDcard_Init()!=0) {
-		printf("No microSD\n\r");
+		printf("No SD\n\r");
 		led_error(MICROSD_NOT_FOUND);
 	}
 
@@ -1008,7 +1002,7 @@ int main()
 		AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
 	}
 	#ifndef DATA_FLASH
-	printf("machtype=%d watchdog status=%d\n\r",mach_type_number, watchdog_buffer);
+	//printf("machtype=%d watchdog status=%d\n\r",mach_type_number, watchdog_buffer);
 	#endif
 
 	//--------------------------------------------------------------------
@@ -1030,7 +1024,7 @@ int main()
 	//SW Reset of SD card reader
 	Acme_SDcard_Stop();
 
-	printf("Jump to Kernel\n\r");
+	//fputs("Krun\n");
 
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 

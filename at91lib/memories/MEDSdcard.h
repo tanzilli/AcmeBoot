@@ -46,5 +46,6 @@ extern unsigned char MEDSdcard_Initialize(Media *media, unsigned char mciID);
 extern unsigned char MEDSdusb_Initialize(Media *media, unsigned char mciID);
 extern void MEDSdcard_EraseAll(Media *media);
 extern void MEDSdcard_EraseBlock(Media *media, unsigned int block);
+extern void MEDSdcard_Stop();
 extern SdCard* MEDSdcard_GetDriver(unsigned int slot);
 #endif //#ifndef MEDSDCARD_H

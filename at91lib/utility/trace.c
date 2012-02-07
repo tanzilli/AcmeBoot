@@ -134,6 +134,7 @@ static void PrintChar(unsigned char c)
 //------------------------------------------------------------------------------
 //         Global Functions
 //------------------------------------------------------------------------------
+#if 0 /* Free a some dead code */
 
 //------------------------------------------------------------------------------
 /// Displays the content of the given frame on the Trace interface.
@@ -296,4 +297,4 @@ unsigned char TRACE_GetHexa32(unsigned int *pValue)
     *pValue = value;     
     return 1;
 }
-
+#endif

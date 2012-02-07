@@ -49,13 +49,17 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.19"
+#define ACME_BOOTSTRAP_VERSION "1.20"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
  *
- * 1.19 watchdog timer enabled
+ * 1.20 Propagate SD_Stop() to work well with any microSD brand
+ *      Deleted the code to read watchdog.txt because too large to be
+ *      fixed in 16KB. 
+ *
+ * 1.19 Watchdog timer enabled
  *
  * 1.18 Read the Kernel CMDLINE configuration from the file cmdline.txt
  *      on the first microSD partition
@@ -102,6 +106,7 @@
 #include <memories/spi-flash/at26.h>
 #include <spi-flash/at45.h>
 #include <peripherals/rstc/rstc.h>
+#include <peripherals/mci/mci.h>
 #include <string.h>
 
 #include "main.h"
@@ -182,6 +187,7 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 #define KERNEL_UIMAGE	"uImage"
 #define KERNEL_CMDLINE	"cmdline.txt"
 #define MACH_TYPE_FILE 	"machtype.txt"
+#define WATCHDOG_FILE 	"watchdog.txt"
 
 //------------------------------------------------------------------------------
 //         Internal definitions
@@ -691,6 +697,7 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
+        char watchdog_buffer;
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -766,10 +773,10 @@ int main()
 	while (!pDesc) {
 		pDesc = AT45_FindDevice(&at45, AT45_GetStatus(&at45));
 	}
-	printf("%s found\n\r", at45.pDesc->name);
+	//printf("%s found\n\r", at45.pDesc->name);
 
 	// Output JEDEC identifier of device
-	printf("Flash id: 0x%08X\n\r", AT45_GetJedecId(&at45));
+	printf("id: 0x%08X\n\r", AT45_GetJedecId(&at45));
 
 	// Get device parameters
 	numPages = AT45_PageNumber(&at45);
@@ -803,10 +810,11 @@ int main()
 
 	//Unprotected the flash
 	AT26_Unprotect(&at26);
-	#endif
 
 	printf("Pg #: %d\n\r",numPages);
 	printf("Pg s: %d\n\r",pageSize);
+
+	#endif
 
 	// Check the magic number to know if has been downloaded from flash
 	// or from Pizzica
@@ -834,7 +842,7 @@ int main()
 		for (page=0;page<(16384/pageSize+1);page++) {
 			memcpy(pBuffer, sram_address + page * AT45_PageSize(&at45), AT45_PageSize(&at45));
 
-			printf("Write page %d\n\r", page);
+			//printf("Write page %d\n\r", page);
 			AT45_Write(&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 			AT45_Read (&at45, pBuffer, AT45_PageSize(&at45), page * AT45_PageSize(&at45));
 
@@ -984,9 +992,12 @@ int main()
 	if (Acme_SDcard_CopyFile(MACH_TYPE_FILE,(unsigned char *)mach_type_buffer,(unsigned long)4)==0) {
 		mach_type_buffer[4]=0;
 		mach_type_number=(unsigned int)atoi(mach_type_buffer);
-	} 
-	printf("machtype=%d\n\r",mach_type_number);
+	}
+	//printf("machtype=%d\n\r",mach_type_number);
 
+
+	// Enable the watchdog timer        
+	AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
 
 	//--------------------------------------------------------------------
 	// Read the Kernel image cutting the first 64 of header
@@ -1002,7 +1013,10 @@ int main()
 	// Red led off
 	PIO_Clear(&foxg20_red_led);
 
-	printf("Jump to Kernel\n\r");
+        //SW Reset of SD card reader
+        Acme_SDcard_Stop();
+
+	printf("Run Kernel\n\r");
 
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 

@@ -169,6 +169,10 @@ int Acme_SDcard_Init(void)
     }
     return 0;   	
 }
+void Acme_SDcard_Stop(void)
+{
+  MEDSdcard_Stop();
+}
 
 int Acme_SDcard_CopyFile(char *filename,unsigned long destination,unsigned long size)
 {

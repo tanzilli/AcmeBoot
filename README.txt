@@ -1,11 +1,11 @@
 ------------------------------------------------------------------------------
 
 AcmeBoot is a tiny boot loader for the Acme Systems Linux SBC
-FOX Board G20 (http://foxg20.acmesystems.it) made by
+FOX Board G20 (http://www.acmesystems.it/?id=FOXG20) made by
 Acme Systems srl (http://www.acmesystems.it)
 
 The AcmeBoot web page is available here:
-http://foxg20.acmesystems.it/doku.php?id=dev:acmeboot
+http://www.acmesystems.it/?id=acmeboot
 
 ------------------------------------------------------------------------------
 HOW TO COMPILE ACMEBOOT
@@ -34,7 +34,7 @@ make serialflash
 The file bin/boot-NetusG20-sdcard2sdram.bin will be created.
 Use this file with Pizzica In-System programming utility 
 as illustrate on:
-http://foxg20.acmesystems.it/doku.php?id=dev:pizzica
+http://www.acmesystems.it/?id=pizzica
 -------------------------------------------------------------------------------
 
 AcmeBoot is based on Atmel AT91Bootstrap v.3.0

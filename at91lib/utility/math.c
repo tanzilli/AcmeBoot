@@ -37,7 +37,7 @@
 //------------------------------------------------------------------------------
 //         Exported functions
 //------------------------------------------------------------------------------
-
+#if 0
 //------------------------------------------------------------------------------
 /// Returns the minimum value between two integers.
 /// \param a  First integer to compare.
@@ -88,4 +88,4 @@ unsigned int power(unsigned int x, unsigned int y)
     } 
     return result;
 }
-
+#endif

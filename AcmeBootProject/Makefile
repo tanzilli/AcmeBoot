@@ -32,42 +32,54 @@
 dataflash:
 	export RUN=1
 	make CHIP=at91sam9g20 BOARD=NetusG20 \
-		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
-		ORIGIN_SD_PORT_MCI1=1 \
-		FLASH_MEMORY=data_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=0 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI1 \
+		FLASH_MEMORY=$@ DRAM_SIZE=DRAM_64MB \
 		clean all
 
 serialflash:
 	export RUN=1
 	make CHIP=at91sam9g20 BOARD=NetusG20 \
-		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
-		ORIGIN_SD_PORT_MCI1=1 \
-		FLASH_MEMORY=serial_flash DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI1 \
+		FLASH_MEMORY=$@ DRAM_SIZE=DRAM_64MB \
 		clean all
 
 sdcard:
 	export RUN=1
 	make CHIP=at91sam9g20 BOARD=NetusG20 \
-		ORIGIN=sdcard DESTINATION=sdram OP_BOOTSTRAP_MCI=on \
-		ORIGIN_SD_PORT_MCI1=1 \
-		DRAM_SIZE=DRAM_64MB TRACE_LEVEL=1 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI1 \
+		FLASH_MEMORY=$@ DRAM_SIZE=DRAM_64MB \
 		clean all
+
+dataflash_mci0:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI0 \
+		FLASH_MEMORY=dataflash DRAM_SIZE=DRAM_64MB \
+		clean all
+
+serialflash_mci0:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI0 \
+		FLASH_MEMORY=serialflash DRAM_SIZE=DRAM_64MB \
+		clean all
+
+flash:
+	`pwd`/pizzica/pizzica.py -f \
+		`pwd`/bin/boot-NetusG20-sdcard2sdram_for_$(TARGET).bin \
+		-d /dev/ttyUSB0; )
 
 #-------------------------------------------------------------------------------
 #        User-modifiable options
 #-------------------------------------------------------------------------------
 
 # Optimization level, put in comment for debugging
-ifeq ($(OP_BOOTSTRAP), on)
 OPTIMIZATION = -march=armv5t -Os
-else
-    ifeq ($(OP_BOOTSTRAP_MCI), on)
-    OPTIMIZATION = -march=armv5t -Os
-    else
-
-    OPTIMIZATION = -O2
-    endif
-endif
 
 # AT91 library directory
 AT91LIB = ../at91lib
@@ -191,6 +203,8 @@ endif
 # Tool suffix when cross-compiling
 #CROSS_COMPILE=arm-linux-gnueabi-
 CROSS_COMPILE?=/home/$(USER)/CodeSourcery/Sourcery_G++_Lite/bin/arm-none-eabi-
+TRACE_LEVEL?=1
+OP_BOOTSTRAP_MCI?=on
 
 # Compilation tools
 CC = $(CROSS_COMPILE)gcc
@@ -205,6 +219,7 @@ CFLAGS += -DBOARD=$(BOARD)
 CFLAGS += -DORIGIN_$(ORIGIN)
 CFLAGS += -DDESTINATION_$(DESTINATION)
 CFLAGS += -DTRACE_LEVEL=$(TRACE_LEVEL)
+CFLAGS += -D$(SD_PORT)
 
 ASFLAGS = -g $(OPTIMIZATION) $(INCLUDES) -D$(CHIP) -D__ASSEMBLY__
 LDFLAGS = -g $(OPTIMIZATION) -nostartfiles -Wl,--gc-sections,-Map=$(OUTPUT).map,--cref
@@ -285,11 +300,11 @@ C_OBJECTS += MEDSdcard.o
 C_OBJECTS += spid.o
 C_OBJECTS += math.o
 
-ifeq ($(FLASH_MEMORY), data_flash)
+ifeq ($(FLASH_MEMORY), dataflash)
 C_OBJECTS += at45.o
 endif
 
-ifeq ($(FLASH_MEMORY), serial_flash)
+ifeq ($(FLASH_MEMORY), serialflash)
 C_OBJECTS += at26.o
 endif
 
@@ -322,11 +337,11 @@ endif
 # Flash memory type on NetusG20
 #-------------------------------------------------------------------------------
 
-ifeq ($(FLASH_MEMORY), data_flash)
+ifeq ($(FLASH_MEMORY), dataflash)
 CFLAGS += -DDATA_FLASH
 endif
 
-ifeq ($(FLASH_MEMORY), serial_flash)
+ifeq ($(FLASH_MEMORY), serialflash)
 CFLAGS += -DSERIAL_FLASH
 endif
 

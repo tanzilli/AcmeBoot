@@ -735,7 +735,7 @@ int main()
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-	printf("\n\rAcmeBoot %s\n\r", ACME_BOOTSTRAP_VERSION);
+	printf("\n\rAcmeBoot %s - %s %s\n\r", ACME_BOOTSTRAP_VERSION, __DATE__, __TIME__);
 	printf("MCK = %dMHz\n\r", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 

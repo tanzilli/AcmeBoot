@@ -69,6 +69,14 @@ serialflash_mci0:
 		FLASH_MEMORY=serialflash DRAM_SIZE=DRAM_64MB \
 		clean all
 
+sdcard_mci0:
+	export RUN=1
+	make CHIP=at91sam9g20 BOARD=NetusG20 \
+		ORIGIN=sdcard DESTINATION=sdram \
+		SD_PORT=ORIGIN_SD_PORT_MCI0 \
+		FLASH_MEMORY=$@ DRAM_SIZE=DRAM_64MB \
+		clean all
+
 flash:
 	`pwd`/pizzica/pizzica.py -f \
 		`pwd`/bin/boot-NetusG20-sdcard2sdram_for_$(TARGET).bin \

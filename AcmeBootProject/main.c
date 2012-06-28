@@ -49,11 +49,13 @@
  * ----------------------------------------------------------------------------
  */
 
-#define ACME_BOOTSTRAP_VERSION "1.21"
+#define ACME_BOOTSTRAP_VERSION "1.22"
 
 /* ----------------------------------------------------------------------------
  * CHANGELOG
  * ----------------------------------------------------------------------------
+ *
+ * 1.22 Removed the watchdog.txt section. Watchdog is enable by default.
  *
  * 1.21 Disable debug information about machtype and watchdog on the dataflash.
  *
@@ -189,7 +191,6 @@ static void GoToJumpAddress(unsigned int jumpAddr, unsigned int matchType,unsign
 #define KERNEL_UIMAGE	"uImage"
 #define KERNEL_CMDLINE	"cmdline.txt"
 #define MACH_TYPE_FILE 	"machtype.txt"
-#define WATCHDOG_FILE 	"watchdog.txt"
 
 //------------------------------------------------------------------------------
 //	 Internal definitions
@@ -690,7 +691,7 @@ static void AT26_Read(
 /// Transfer data from media to main memory and return the next application entry
 /// point address.
 //------------------------------------------------------------------------------
-int main()
+void main(void)
 {
 	unsigned char *sram_address = (unsigned char *)0x200000;
 	unsigned int numPages;
@@ -699,7 +700,6 @@ int main()
 
 	char *tmp;
 	char mach_type_buffer[5];
-	char watchdog_buffer;
 	unsigned int mach_type_number;
 
 	#ifdef SERIAL_FLASH
@@ -923,7 +923,7 @@ int main()
 	AT91C_BASE_RSTC->RSTC_RMR |= AT91C_RSTC_URSTEN | (0xA5<<24);
 
 	if (Acme_SDcard_Init()!=0) {
-		printf("No SD\n\r");
+		printf("SD card not found\n\r");
 		led_error(MICROSD_NOT_FOUND);
 	}
 
@@ -990,20 +990,8 @@ int main()
 	} 
 
 
-	//--------------------------------------------------------------------
-	// Read the requested watchdog state from watchdog.txt
-	// 0 - disabled
-	// 1 - enabled
-	// if the file is missing the watchdog will be enabled
-	//--------------------------------------------------------------------
-	watchdog_buffer='1';
-	Acme_SDcard_CopyFile(WATCHDOG_FILE,(unsigned char *)&watchdog_buffer,(unsigned long)1);
-	if(watchdog_buffer=='0'){
-		AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
-	}
-	#ifndef DATA_FLASH
-	//printf("machtype=%d watchdog status=%d\n\r",mach_type_number, watchdog_buffer);
-	#endif
+	//Add the following line to disable the watchdog
+	//AT91C_BASE_WDTC->WDTC_WDMR = AT91C_WDTC_WDDIS;
 
 	//--------------------------------------------------------------------
 	// Read the Kernel image cutting the first 64 of header
@@ -1024,11 +1012,9 @@ int main()
 	//SW Reset of SD card reader
 	Acme_SDcard_Stop();
 
-	//fputs("Krun\n");
-
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 
 	led_error(FLASH_WRITE_ERROR);
-	return 0;
+	// Never reached point
 }
 

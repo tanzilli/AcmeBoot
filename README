@@ -48,7 +48,7 @@ Pizzica In-System programming utility to flash the appropriate file as illustrat
 http://www.acmesystems.it/pizzica
 
 For example for a dataflash board:
-	$ python pizzica.py -f bin/boot-NetusG20-sdcard2sdram_for_data_flash -d /dev/ttyUSB0
+	$ python pizzica.py -f bin/boot-NetusG20-sdcard2sdram_for_dataflash.bin -d /dev/ttyUSB0
 
 CREDITS
 -------

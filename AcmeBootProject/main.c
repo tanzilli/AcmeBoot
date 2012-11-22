@@ -140,6 +140,12 @@ static const Pin foxg20_pc4  = {1 <<  4, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INP
 static const Pin foxg20_pc5  = {1 <<  5, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INPUT, PIO_PULLUP};
 static const Pin foxg20_pc10 = {1 << 10, AT91C_BASE_PIOC, AT91C_ID_PIOC, PIO_INPUT, PIO_PULLUP};
 
+// Per Alessandro Gobbi
+// Ridefinisce PA2 per poterla usare come GPIO generico
+static const Pin spi_pa2  = {1 <<  2, AT91C_BASE_PIOA, AT91C_ID_PIOA, PIO_INPUT, PIO_PULLUP};
+
+
+
 //------------------------------------------------------------------------------
 /// Error coding on red led
 //------------------------------------------------------------------------------
@@ -735,7 +741,7 @@ void main(void)
 	//-------------------------------------------------------------------------
 	TRACE_CONFIGURE_ISP(DBGU_STANDARD, 115200, BOARD_MCK);
 
-	printf("\n\rAcmeBoot %s - %s %s\n\r", ACME_BOOTSTRAP_VERSION, __DATE__, __TIME__);
+	printf("\n\rAlexBoot %s - %s %s\n\r", ACME_BOOTSTRAP_VERSION, __DATE__, __TIME__);
 	printf("MCK = %dMHz\n\r", (int)(BOARD_MCK/1000000));
 
 	// If the RTC registers are unitializated set then to default 
@@ -1011,6 +1017,10 @@ void main(void)
 
 	//SW Reset of SD card reader
 	Acme_SDcard_Stop();
+
+	//Per Alessandro Gobbi
+	//Ridefinisce i pin PA2 prima di lanciare il kernel Linux
+	PIO_Configure(&spi_pa2, 1);
 
 	GoToJumpAddress(SDRAM_START+0x8000, mach_type_number, (unsigned int *)ATAG_POS);
 
